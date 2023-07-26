@@ -53,7 +53,8 @@ import {
 import { SetStateAction, useContext, useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 
-//pubkeys
+// pubkeys
+
 import Pubkey from "./Pioneer/Pubkey"
 import Balances from "./Pioneer/Balances"
 
@@ -511,18 +512,14 @@ const Header = () => {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerHeader borderBottomWidth="1px">
-            Navigation Options
+            Menu
           </DrawerHeader>
-          <DrawerBody>
+          <DrawerBody bg={'black'} >
             <Button w="full" mb={2} onClick={() => handleNavigate("/dapps")}>
-              Explore Dapps
+              HiveLogin
             </Button>
-            <Button
-              w="full"
-              mb={2}
-              onClick={() => handleNavigate("/blockchains")}
-            >
-              Explore Blockchains
+            <Button w="full" mb={2} onClick={() => handleNavigate("/wallet")}>
+              Wallet
             </Button>
             <Button w="full" mb={2} onClick={() => handleNavigate("/assets")}>
               Explore Assets
@@ -539,7 +536,7 @@ const Header = () => {
           </DrawerBody>
         </DrawerContent>
       </Drawer>
-      <IconButton
+      <IconButton bg={"black"}
         size="md"
         icon={navigationDisclosure.isOpen ? <CloseIcon /> : <ArrowUpDownIcon />}
         aria-label={navigationDisclosure.isOpen ? "Close Menu" : "Open Menu"}
@@ -552,7 +549,7 @@ const Header = () => {
       </HStack>
       <Spacer />
       <Menu>
-        <MenuButton
+        <MenuButton 
           as={Button}
           rounded="full"
           variant="link"
@@ -569,7 +566,7 @@ const Header = () => {
             </Avatar>
           )}
         </MenuButton>
-        <MenuList>
+        <MenuList bg={"black"}>
           <MenuItem>
             <SimpleGrid columns={3} row={1}>
               <Card align="center" onClick={() => setContextWallet("native")}>
