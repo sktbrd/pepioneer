@@ -7,5 +7,7 @@ module.exports = {
 
     // Add the rule for consistent type imports
     '@typescript-eslint/consistent-type-imports': 'error',
+    "prettier/prettier": "off"
+
   }
 };

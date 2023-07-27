@@ -44,7 +44,7 @@ const PlaceholderPostModal = ({ title, content, author, onClose }) => {
 const PlaceholderLoadingBar = () => {
   // Placeholder LoadingBar component, you can replace this with your actual LoadingBar
   return (
-      <Text>Loading...</Text>
+      <Text>Roll a Joint...</Text>
   );
 };
 
@@ -171,19 +171,18 @@ const HiveBlog = () => {
       {isLoading ? (
         <PlaceholderLoadingBar />
       ) : (
-        <Box display="grid" gridTemplateColumns={`repeat(${gridColumns}, minmax(280px, 1fr))`} gridGap={4}>          
+        <Box display="grid" gridTemplateColumns={`repeat(${gridColumns}, minmax(280px, 1fr))`} gridGap={3}>          
         {posts.map((post) => (
             <Card border={'1px'} borderColor={'limegreen'} bg={"black"} key={post.permlink} maxW="md" mb={4}>
               <CardHeader>
                 <Flex spacing="4">
-                  <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
+                  <Flex flex="1" gap="4" alignItems="center">
                     <Avatar
                       name={post.author}
                       src={`https://images.ecency.com/webp/u/${post.author}/avatar/small`}
                     />
                     <Box>
                       <Heading size="sm">{post.author}</Heading>
-                      <Text>Creator, Chakra UI</Text>
                     </Box>
                   </Flex>
                   <IconButton
@@ -193,22 +192,23 @@ const HiveBlog = () => {
                   />
                 </Flex>
               </CardHeader>
-              <CardBody>
-                <Text>{post.title}</Text>
-              </CardBody>
-              <Box height="200px"> {/* Set the fixed height for thumbnails */}
+              <Box padding="10px" height="200px"> {/* Set the fixed height for thumbnails */}
                 <Image
                   objectFit="cover"
+                  border="1px solid limegreen"
+                  borderRadius="10px"
                   src={post.thumbnail}
                   alt="Post Thumbnail"
                   height="100%" // Make the image fill the container height
                   width="100%" // Ensure the image maintains its aspect ratio
                 />
               </Box>
-
+              <CardBody>
+                <Text>{post.title}</Text>
+              </CardBody>
               <CardFooter
                 justify="space-between"
-                flexWrap="wrap"
+                flexWrap="flex"
                 sx={{
                   "& > button": {
                     minW: "136px",

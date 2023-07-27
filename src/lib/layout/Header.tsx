@@ -74,6 +74,7 @@ import METAMASK_ICON from "lib/assets/png/metamask.png";
 import PIONEER_ICON from "lib/assets/png/pioneer.png";
 // import Context from "lib/context";
 import {usePioneer} from "lib/context/Pioneer";
+import HiveLogin from "lib/pages/home/components/HiveLoginModal";
 
 const getWalletType = (user: { walletDescriptions: any[] }, context: any) => {
   if (user && user.walletDescriptions) {
@@ -393,13 +394,7 @@ const Header = () => {
     }
   };
 
-  const handleCardClick = async function (pubkey: string) {
-    try {
-      console.log(pubkey);
-    } catch (e) {
-      console.error(e);
-    }
-  };
+
 
   const handleCopyClick = async (event:any, address:string) => {
     event.stopPropagation(); // Prevent the card from being clicked
@@ -435,7 +430,12 @@ const Header = () => {
         {pageNumber}
       </Button>
   ));
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const handleCardClick = () => {
+    onOpen();
+    console.log("Card clicked");
+  };
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return (
@@ -505,7 +505,7 @@ const Header = () => {
         </ModalContent>
       </Modal>
       <Drawer
-        placement="left"
+        placement="top"
         onClose={navigationDisclosure.onClose}
         isOpen={navigationDisclosure.isOpen}
       >
@@ -536,7 +536,7 @@ const Header = () => {
           </DrawerBody>
         </DrawerContent>
       </Drawer>
-      <IconButton bg={"black"}
+      <IconButton bg="black"
         size="md"
         icon={navigationDisclosure.isOpen ? <CloseIcon /> : <ArrowUpDownIcon />}
         aria-label={navigationDisclosure.isOpen ? "Close Menu" : "Open Menu"}
@@ -549,29 +549,26 @@ const Header = () => {
       </HStack>
       <Spacer />
       <Menu>
-        <MenuButton 
-          as={Button}
-          rounded="full"
-          variant="link"
-          cursor="pointer"
-          minW={200}
-        >
-          {isPioneer ? (
-            <Avatar size="lg" src={pioneerImage}>
-              {avatarContent}
-            </Avatar>
-          ) : (
-            <Avatar size="lg" src={PIONEER_ICON}>
-              {avatarContent}
-            </Avatar>
-          )}
-        </MenuButton>
-        <MenuList bg={"black"}>
+      <MenuButton 
+        as={Button}
+        rounded="md"
+        variant="solid"
+        bg="limegreen"
+        color="white"
+        cursor="pointer"
+        minW={200}
+        px={4} // Add horizontal padding
+        py={2} // Add vertical padding
+      >
+        WALLETS
+      </MenuButton>
+        <MenuList bg="black">
           <MenuItem>
             <SimpleGrid columns={3} row={1}>
-              <Card align="center" onClick={() => setContextWallet("native")}>
+            <div>
+              <Card align="center" onClick={handleCardClick}>
                 <CardBody>
-                  <Avatar src={PIONEER_ICON}>
+                  <Avatar src="public/assets/favicon.ico">
                     {nativePaired ? (
                       <div>
                         <AvatarBadge boxSize="1.25em" bg="green.500" />
@@ -583,8 +580,23 @@ const Header = () => {
                     )}
                   </Avatar>
                 </CardBody>
-                <small>Pioneer</small>
+                <small>Hive Keychain</small>
               </Card>
+
+              <Modal isOpen={isOpen} onClose={onClose}>
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>Modal Title</ModalHeader>
+                  <ModalCloseButton />
+                  <ModalBody>
+                    <HiveLogin isOpen={isOpen} onClose={onClose} />
+                  </ModalBody>
+                  <ModalFooter>
+                    {/* Your modal footer goes here */}
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
+            </div>
               <Card align="center" onClick={() => setContextWallet("metamask")}>
                 <CardBody>
                   <Avatar src={METAMASK_ICON}>

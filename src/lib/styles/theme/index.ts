@@ -6,12 +6,23 @@ export const theme = extendTheme({
   initialColorMode: "dark",
   useSystemColorMode: false,
   fonts: {
-    heading: "Plus Jakarta Sans, sans-serif",
-    body: "Plus Jakarta Sans, sans-serif",
+    heading: "Courier New, monospace",
+    body: "Courier New, monospace",
   },
   components: {
     // Button: {
     // }
+  },
+  styles: {
+    global: (props) => ({
+      body: {
+        backgroundColor: "black",
+        color: props.colorMode === "dark" ? "white" : "black",
+      },
+      p: {
+        color: "limegreen",
+      },
+    }),
   },
   config,
 });

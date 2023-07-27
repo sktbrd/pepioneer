@@ -5,7 +5,7 @@ const APP_NAME = "Pioneer Template";
 const Meta = () => {
   return (
     <Helmet>
-      <title>Pioneer Template</title>
+      <title> </title>
       <meta name="description" content="Pioneer Template" />
 
       <meta name="application-name" content={APP_NAME} />
@@ -16,7 +16,7 @@ const Meta = () => {
       <meta name="mobile-web-app-capable" content="yes" />
       <meta name="theme-color" content="#228B22" />
 
-      <link rel="shortcut icon" href="/assets/favicon.svg" />
+      <link rel="shortcut icon" href="/assets/favicon.ico" />
       <link rel="manifest" href="/manifest.json" />
     </Helmet>
   );
