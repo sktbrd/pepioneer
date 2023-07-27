@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from "react";
+
 import { Client } from "@hiveio/dhive";
+
 import {
-    Avatar,
-    Box,
-    Button,
-    Card,
-    CardBody,
-    CardFooter,
-    CardHeader,
-    Flex,
-    Heading,
-    IconButton,
-    Image,
-    Text,
-  } from "@chakra-ui/react";
-  
+  Avatar,
+  Box,
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Flex,
+  Heading,
+  IconButton,
+  Image,
+  Text,
+} from "@chakra-ui/react";
+
 const nodes = [
   "https://rpc.ecency.com",
   "https://api.deathwing.me",
@@ -25,10 +27,16 @@ const nodes = [
   "https://api.pharesim.me",
 ];
 
-const defaultThumbnail = "https://images.ecency.com/u/hive-173115/avatar/large";
+const defaultThumbnail =
+  "https://images.ecency.com/u/hive-173115/avatar/large";
 const placeholderEarnings = 69.42; // Replace with actual placeholder value
 
-const PlaceholderPostModal = ({ title, content, author, onClose }) => {
+const PlaceholderPostModal = ({ title, content, author, onClose }: {
+  title: string;
+  content: string;
+  author: string;
+  onClose: () => void;
+}) => {
   // Placeholder PostModal component, you can replace this with your actual PostModal
   return (
     <Box>
@@ -43,20 +51,18 @@ const PlaceholderPostModal = ({ title, content, author, onClose }) => {
 
 const PlaceholderLoadingBar = () => {
   // Placeholder LoadingBar component, you can replace this with your actual LoadingBar
-  return (
-      <Text>Roll a Joint...</Text>
-  );
+  return <Text>Roll a Joint...</Text>;
 };
 
 const HiveBlog = () => {
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<any[]>([]);
   const [tag, setTag] = useState("hive-173115"); // set the default search author to "skatehive"
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedPost, setSelectedPost] = useState(null);
+  const [selectedPost, setSelectedPost] = useState<any | null>(null);
   const [client, setClient] = useState(new Client(nodes[0]));
   const [nodeIndex, setNodeIndex] = useState(0);
 
- const fetchPostEarnings = async (author, permlink) => {
+  const fetchPostEarnings = async (author: string, permlink: string): Promise<number> => {
     try {
       const post = await client.database.call("get_content", [author, permlink]);
       const totalPayout = parseFloat(post.total_payout_value.split(" ")[0]);
@@ -74,7 +80,6 @@ const HiveBlog = () => {
       return fetchPostEarnings(author, permlink);
     }
   };
-  
 
   const fetchPosts = async () => {
     setIsLoading(true);
@@ -105,11 +110,10 @@ const HiveBlog = () => {
       const earnings = await Promise.all(earningsPromises);
 
       // Update earnings for each post
-      for (let i = 0; i < postsWithThumbnails.length; i++) {
-        postsWithThumbnails[i].earnings = earnings[i];
-      }
-
-      setPosts(postsWithThumbnails);
+      const updatedPostsWithEarnings = postsWithThumbnails.map(
+        (post, index) => ({ ...post, earnings: earnings[index] })
+      );
+      setPosts(updatedPostsWithEarnings);
     } catch (error) {
       console.log(error);
     }
@@ -121,15 +125,15 @@ const HiveBlog = () => {
     fetchPosts();
   }, [tag]);
 
-  const handlePostClick = (post) => {
+  const handlePostClick = (post: any) => {
     setSelectedPost(post);
     console.log(post.body);
-    console.log(post)
+    console.log(post);
   };
 
   const handleModalClose = () => {
     setSelectedPost(null);
-  }
+  };
 
   const calculateGridColumns = () => {
     const screenWidth = window.innerWidth;
@@ -162,7 +166,6 @@ const HiveBlog = () => {
           <PlaceholderPostModal
             title={selectedPost.title}
             content={selectedPost.body}
-            permlink={selectedPost.permlink}
             author={selectedPost.author}
             onClose={handleModalClose}
           />
@@ -171,11 +174,23 @@ const HiveBlog = () => {
       {isLoading ? (
         <PlaceholderLoadingBar />
       ) : (
-        <Box display="grid" gridTemplateColumns={`repeat(${gridColumns}, minmax(280px, 1fr))`} gridGap={3}>          
-        {posts.map((post) => (
-            <Card border={'1px'} borderColor={'limegreen'} bg={"black"} key={post.permlink} maxW="md" mb={4}>
+        <Box
+          display="grid"
+          gridTemplateColumns={`repeat(${gridColumns}, minmax(280px, 1fr))`}
+          gridGap={3}
+        >
+          {posts.map((post) => (
+            <Card
+              border={"1px"}
+              borderColor={"limegreen"}
+              bg={"black"}
+              key={post.permlink}
+              maxW="md"
+              mb={4}
+              onClick={() => handlePostClick(post)}
+            >
               <CardHeader>
-                <Flex spacing="4">
+                <Flex>
                   <Flex flex="1" gap="4" alignItems="center">
                     <Avatar
                       name={post.author}
@@ -192,7 +207,8 @@ const HiveBlog = () => {
                   />
                 </Flex>
               </CardHeader>
-              <Box padding="10px" height="200px"> {/* Set the fixed height for thumbnails */}
+              <Box padding="10px" height="200px">
+                {/* Set the fixed height for thumbnails */}
                 <Image
                   objectFit="cover"
                   border="1px solid limegreen"
@@ -208,7 +224,7 @@ const HiveBlog = () => {
               </CardBody>
               <CardFooter
                 justify="space-between"
-                flexWrap="flex"
+                flexWrap="wrap"
                 sx={{
                   "& > button": {
                     minW: "136px",

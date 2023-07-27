@@ -1,7 +1,23 @@
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Button, Input } from "@chakra-ui/react";
+import React from "react";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Button,
+  Input,
+} from "@chakra-ui/react";
 import { useState } from "react";
 
-const HiveLogin = ({ isOpen, onClose }) => {
+interface HiveLoginProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const HiveLogin: React.FC<HiveLoginProps> = ({ isOpen, onClose }) => {
   const [username, setUsername] = useState("");
 
   const handleLogin = () => {
@@ -16,19 +32,15 @@ const HiveLogin = ({ isOpen, onClose }) => {
         <ModalHeader>Hive Login</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Input 
-            placeholder="Username" 
-            value={username} 
+          <Input
+            placeholder="Username"
+            value={username}
             onChange={(event) => setUsername(event.target.value)}
           />
         </ModalBody>
         <ModalFooter>
-          <Button onClick={handleLogin}>
-            Login
-          </Button>
-          <Button onClick={onClose}>
-            Close
-          </Button>
+          <Button onClick={handleLogin}>Login</Button>
+          <Button onClick={onClose}>Close</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

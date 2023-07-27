@@ -1,10 +1,14 @@
 import { extendTheme } from "@chakra-ui/react";
 
-import { config } from "./config";
+type GlobalStyleProps = { colorMode: "light" | "dark" };
 
-export const theme = extendTheme({
+const themeConfig = {
   initialColorMode: "dark",
   useSystemColorMode: false,
+};
+
+export const theme = extendTheme({
+  ...themeConfig,
   fonts: {
     heading: "Courier New, monospace",
     body: "Courier New, monospace",
@@ -14,7 +18,7 @@ export const theme = extendTheme({
     // }
   },
   styles: {
-    global: (props) => ({
+    global: (props: GlobalStyleProps) => ({
       body: {
         backgroundColor: "black",
         color: props.colorMode === "dark" ? "white" : "black",
@@ -24,5 +28,4 @@ export const theme = extendTheme({
       },
     }),
   },
-  config,
 });

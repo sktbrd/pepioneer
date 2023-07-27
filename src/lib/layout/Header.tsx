@@ -558,7 +558,7 @@ const Header = () => {
         cursor="pointer"
         minW={200}
         px={4} // Add horizontal padding
-        py={2} // Add vertical padding
+        py={4} // Add vertical padding
       >
         WALLETS
       </MenuButton>
@@ -568,7 +568,7 @@ const Header = () => {
             <div>
               <Card align="center" onClick={handleCardClick}>
                 <CardBody>
-                  <Avatar src="public/assets/favicon.ico">
+                  <Avatar src="assets/favicon.ico">
                     {nativePaired ? (
                       <div>
                         <AvatarBadge boxSize="1.25em" bg="green.500" />
@@ -681,7 +681,7 @@ const Header = () => {
                   {currentPubkeys.map((pubkey: any, index: number) => (
                       <Card
                           key={pubkey.pubkey}
-                          onClick={() => handleCardClick(pubkey.pubkey)}
+                          onClick={() => handleCardClick()}
                           variant="elevated"
                           maxW="sm"
                           borderWidth="1px"
