@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -10,7 +10,9 @@ import {
   Button,
   Input,
 } from "@chakra-ui/react";
-import { useState } from "react";
+
+import useAuthUser from "../../../../lib/context/Pioneer/useAuthUser.js";
+
 
 interface HiveLoginProps {
   isOpen: boolean;
@@ -19,27 +21,52 @@ interface HiveLoginProps {
 
 const HiveLogin: React.FC<HiveLoginProps> = ({ isOpen, onClose }) => {
   const [username, setUsername] = useState("");
+  const { loginWithHive, user } = useAuthUser();
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    await loginWithHive(username);
+    setUsername("");
+    onClose();
+
+  };
+
+  const handleInputChange = (event) => {
+    setUsername(event.target.value);
+  };
+
+  const handleSignUp = () => {
+    window.open("https://discord.gg/skatehive", "_blank");
+  };
 
   const handleLogin = () => {
-    console.log(username);
-    // Here you can implement the login logic
+    console.log("User from dhive:", user);
+    handleSubmit();
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent as="form" onSubmit={handleSubmit}>
         <ModalHeader>Hive Login</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Input
+            type="text"
+            name="username"
             placeholder="Username"
             value={username}
-            onChange={(event) => setUsername(event.target.value)}
+            onChange={handleInputChange}
+            required
           />
         </ModalBody>
         <ModalFooter>
-          <Button onClick={handleLogin}>Login</Button>
+          <Button type="submit" onClick={handleLogin}>
+            Login
+          </Button>
+          <Button type="button" onClick={handleSignUp}>
+            Sign Up
+          </Button>
           <Button onClick={onClose}>Close</Button>
         </ModalFooter>
       </ModalContent>

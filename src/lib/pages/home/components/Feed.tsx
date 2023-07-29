@@ -1,7 +1,3 @@
-import React, { useEffect, useState } from "react";
-
-import { Client } from "@hiveio/dhive";
-
 import {
   Avatar,
   Box,
@@ -15,7 +11,18 @@ import {
   IconButton,
   Image,
   Text,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  useDisclosure,
 } from "@chakra-ui/react";
+
+import { Client } from "@hiveio/dhive";
+
+import { useEffect, useState } from "react";
+
+import PostModal from "./postModal";
+
 
 const nodes = [
   "https://rpc.ecency.com",
@@ -27,31 +34,13 @@ const nodes = [
   "https://api.pharesim.me",
 ];
 
-const defaultThumbnail =
-  "https://images.ecency.com/u/hive-173115/avatar/large";
+const defaultThumbnail ="https://images.ecency.com/u/hive-173115/avatar/large";
 const placeholderEarnings = 69.42; // Replace with actual placeholder value
 
-const PlaceholderPostModal = ({ title, content, author, onClose }: {
-  title: string;
-  content: string;
-  author: string;
-  onClose: () => void;
-}) => {
-  // Placeholder PostModal component, you can replace this with your actual PostModal
-  return (
-    <Box>
-      <Text>Post Modal</Text>
-      <Text>Title: {title}</Text>
-      <Text>Author: {author}</Text>
-      <Text>Content: {content}</Text>
-      <Text onClick={onClose}>Close Modal</Text>
-    </Box>
-  );
-};
 
 const PlaceholderLoadingBar = () => {
   // Placeholder LoadingBar component, you can replace this with your actual LoadingBar
-  return <Text>Roll a Joint...</Text>;
+  return <center><Text>Roll a Joint...</Text></center>;
 };
 
 const HiveBlog = () => {
@@ -80,6 +69,7 @@ const HiveBlog = () => {
       return fetchPostEarnings(author, permlink);
     }
   };
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const fetchPosts = async () => {
     setIsLoading(true);
@@ -129,11 +119,10 @@ const HiveBlog = () => {
     setSelectedPost(post);
     console.log(post.body);
     console.log(post);
+    onOpen(); // Open the modal
   };
+  
 
-  const handleModalClose = () => {
-    setSelectedPost(null);
-  };
 
   const calculateGridColumns = () => {
     const screenWidth = window.innerWidth;
@@ -161,29 +150,33 @@ const HiveBlog = () => {
 
   return (
     <Box>
-      {selectedPost && (
-        <Box>
-          <PlaceholderPostModal
-            title={selectedPost.title}
-            content={selectedPost.body}
-            author={selectedPost.author}
-            onClose={handleModalClose}
+      <Modal isOpen={isOpen} onClose={onClose} size="xl">
+        <ModalOverlay />
+        <ModalContent>
+          <PostModal
+            title={selectedPost?.title}
+            content={selectedPost?.body}
+            author={selectedPost?.author}
+            onClose={onClose}
+            permlink={selectedPost?.permlink}
+            isOpen={isOpen} // Pass isOpen prop
           />
-        </Box>
-      )}
+        </ModalContent>
+      </Modal>
+
       {isLoading ? (
         <PlaceholderLoadingBar />
       ) : (
         <Box
           display="grid"
           gridTemplateColumns={`repeat(${gridColumns}, minmax(280px, 1fr))`}
-          gridGap={3}
+          gridGap={4}
         >
           {posts.map((post) => (
             <Card
-              border={"1px"}
-              borderColor={"limegreen"}
-              bg={"black"}
+              border="1px"
+              borderColor="limegreen"
+              bg="black"
               key={post.permlink}
               maxW="md"
               mb={4}
@@ -232,9 +225,6 @@ const HiveBlog = () => {
                 }}
               >
                 <Button flex="1" variant="ghost">
-                  Like
-                </Button>
-                <Button flex="1" variant="ghost">
                   Share
                 </Button>
               </CardFooter>
@@ -244,6 +234,7 @@ const HiveBlog = () => {
       )}
     </Box>
   );
+
 };
 
 export default HiveBlog;
