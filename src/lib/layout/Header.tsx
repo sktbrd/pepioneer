@@ -505,7 +505,7 @@ const Header = () => {
         </ModalContent>
       </Modal>
       <Drawer
-        placement="top"
+        placement="left"
         onClose={navigationDisclosure.onClose}
         isOpen={navigationDisclosure.isOpen}
       >
@@ -515,23 +515,11 @@ const Header = () => {
             Menu
           </DrawerHeader>
           <DrawerBody bg={'black'} >
-            <Button w="full" mb={2} onClick={() => handleNavigate("/dapps")}>
-              HiveLogin
+            <Button w="full" mb={2} onClick={() => handleNavigate("/")}>
+              Home
             </Button>
             <Button w="full" mb={2} onClick={() => handleNavigate("/wallet")}>
               Wallet
-            </Button>
-            <Button w="full" mb={2} onClick={() => handleNavigate("/assets")}>
-              Explore Assets
-            </Button>
-            <Button w="full" mb={2} onClick={() => handleNavigate("/nodes")}>
-              Explore Nodes
-            </Button>
-            <Button w="full" mb={2} onClick={() => handleNavigate("/pioneers")}>
-              Pioneer Leaderboard
-            </Button>
-            <Button w="full" mb={2} onClick={() => handleNavigate("/chart")}>
-              Chart Discovery
             </Button>
           </DrawerBody>
         </DrawerContent>
@@ -662,11 +650,11 @@ const Header = () => {
                     </h2>
                     <AccordionPanel pb={4}>
                       <Balances balances={balances}></Balances>                      
-                       {/*{balances.map((balance: any) => (*/}
+                       {/* {balances.map((balance: any) => (*/}
                        {/*   <div>*/}
                        {/*     <Balance balance={balance}></Balance>*/}
                        {/*   </div>*/}
-                       {/*))}*/}
+                       {/*))} */}
                     </AccordionPanel>
                   </AccordionItem>
                 </Accordion>

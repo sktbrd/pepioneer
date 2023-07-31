@@ -1,4 +1,4 @@
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Flex, Stack } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 
 import Footer from "./Footer";
@@ -11,15 +11,15 @@ type LayoutProps = {
 
 const Layout = ({ children }: LayoutProps) => {
   return (
-    <Box padding="10px" margin="0 auto" display="flex" maxWidth="100%" transition="0.5s ease-out" overflowX="hidden">
+    <Box padding="10px" display="flex" maxWidth="100%" transition="0.5s ease-out" overflowX="hidden">
       <Meta />
-      <Flex wrap="wrap" margin="8" minHeight="90vh">
+      <Stack direction="column" spacing={4} flexGrow={1} width="100%">
         <Header />
-        <Box width="full" as="main">
+        <Box as="main">
           {children}
         </Box>
         <Footer />
-      </Flex>
+      </Stack>
     </Box>
   );
 };

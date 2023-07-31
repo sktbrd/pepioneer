@@ -170,7 +170,7 @@ const HiveBlog = () => {
         <Box
           display="grid"
           gridTemplateColumns={`repeat(${gridColumns}, minmax(280px, 1fr))`}
-          gridGap={4}
+          gridGap={1}
         >
           {posts.map((post) => (
             <Card
@@ -184,7 +184,7 @@ const HiveBlog = () => {
             >
               <CardHeader>
                 <Flex>
-                  <Flex flex="1" gap="4" alignItems="center">
+                  <Flex flex="1" gap="3" alignItems="center">
                     <Avatar
                       name={post.author}
                       src={`https://images.ecency.com/webp/u/${post.author}/avatar/small`}
