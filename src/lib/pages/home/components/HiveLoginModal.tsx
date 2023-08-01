@@ -11,8 +11,7 @@ import {
   Input,
 } from "@chakra-ui/react";
 
-import useAuthUser from "../../../../lib/context/Pioneer/useAuthUser.js";
-
+import useAuthUser from "./useAuthUser.js";
 
 interface HiveLoginProps {
   isOpen: boolean;
@@ -23,25 +22,19 @@ const HiveLogin: React.FC<HiveLoginProps> = ({ isOpen, onClose }) => {
   const [username, setUsername] = useState("");
   const { loginWithHive, user } = useAuthUser();
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     await loginWithHive(username);
     setUsername("");
     onClose();
-
   };
 
-  const handleInputChange = (event) => {
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
   };
 
   const handleSignUp = () => {
     window.open("https://discord.gg/skatehive", "_blank");
-  };
-
-  const handleLogin = () => {
-    console.log("User from dhive:", user);
-    handleSubmit();
   };
 
   return (
@@ -51,22 +44,26 @@ const HiveLogin: React.FC<HiveLoginProps> = ({ isOpen, onClose }) => {
         <ModalHeader>Hive Login</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={username}
-            onChange={handleInputChange}
-            required
-          />
+          {user && user.name ? (
+            <p>Welcome, {user.name}!</p>
+          ) : (
+            <>
+              <Input
+                type="text"
+                name="username"
+                placeholder="Username"
+                value={username}
+                onChange={handleInputChange}
+                required
+              />
+              <Button type="submit">Login</Button>
+              <Button type="button" onClick={handleSignUp}>
+                Sign Up
+              </Button>
+            </>
+          )}
         </ModalBody>
         <ModalFooter>
-          <Button type="submit" onClick={handleLogin}>
-            Login
-          </Button>
-          <Button type="button" onClick={handleSignUp}>
-            Sign Up
-          </Button>
           <Button onClick={onClose}>Close</Button>
         </ModalFooter>
       </ModalContent>

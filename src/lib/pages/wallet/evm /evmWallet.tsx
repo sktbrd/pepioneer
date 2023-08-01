@@ -1,3 +1,5 @@
+export {};
+
 import React, { useEffect, useState } from "react";
 import { usePioneer } from "lib/context/Pioneer";
 import {
@@ -9,18 +11,22 @@ import {
   Th,
   Td,
   Image,
-  Spinner,
   Select,
   Flex,
   Button,
 } from "@chakra-ui/react";
 
-interface TableProps {
-  headers: string[];
-  data: any[][];
+interface Balance {
+  id: string;
+  image: string;
+  name: string;
+  balance: string;
+  balanceUSD: string;
+  network: string;
+  pubkey: string;
 }
 
-const EvmBalance: React.FC = () => {
+const EvmBalance: React.FC = (): JSX.Element => {
   const { state, dispatch } = usePioneer();
   const { user } = state;
 
@@ -30,19 +36,20 @@ const EvmBalance: React.FC = () => {
 
   const headers = ["Asset", "Balance", "Balance USD"];
 
-  const [tableData, setTableData] = useState(user.balances);
-  const [selectedBlockchain, setSelectedBlockchain] = useState("all");
+  const [tableData, setTableData] = useState<Balance[]>(user.balances);
+  const [selectedBlockchain, setSelectedBlockchain] = useState<string>("all");
 
   useEffect(() => {
     if (selectedBlockchain === "all") {
       setTableData(user.balances);
     } else {
-      setTableData(user.balances.filter((balance) => balance.network === selectedBlockchain));
+      // Explicitly specify the type for the 'balance' parameter in the filter callback
+      setTableData(user.balances.filter((balance: Balance) => balance.network === selectedBlockchain));
     }
   }, [selectedBlockchain, user.balances]);
 
-  const blockchains = Array.from(new Set(user.balances.map((balance) => balance.network)));
-  blockchains.unshift("all");
+  const blockchains: string[] = Array.from(new Set(user.balances.map((balance: Balance) => balance.network)));
+  blockchains.unshift("all");   
 
   const totalBalanceUSD = tableData.reduce(
     (total, balance) => total + parseFloat(balance.balanceUSD || "0"),
@@ -50,7 +57,7 @@ const EvmBalance: React.FC = () => {
   );
 
   // Function to copy the receiving address to the clipboard
-  const copyToClipboard = (address) => {
+  const copyToClipboard = (address: string): void => {
     const textarea = document.createElement("textarea");
     textarea.value = address;
     document.body.appendChild(textarea);
@@ -74,7 +81,7 @@ const EvmBalance: React.FC = () => {
           w="150px"
         >
           {blockchains.map((blockchain) => (
-            <option key={blockchain} value={blockchain}>
+            <option key={blockchain} value={blockchain as string}>
               {blockchain === "all" ? "All Blockchains" : blockchain}
             </option>
           ))}

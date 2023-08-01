@@ -153,14 +153,16 @@ const HiveBlog = () => {
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
         <ModalContent>
-          <PostModal
-            title={selectedPost?.title}
-            content={selectedPost?.body}
-            author={selectedPost?.author}
-            onClose={onClose}
-            permlink={selectedPost?.permlink}
-            isOpen={isOpen} // Pass isOpen prop
-          />
+        <PostModal
+          title={selectedPost?.title}
+          content={selectedPost?.body}
+          author={selectedPost?.author}
+          user={selectedPost?.user} // replace with actual value
+          permlink={selectedPost?.permlink} // replace with actual value
+          weight={selectedPost?.weight} // replace with actual value
+          onClose={onClose}
+          isOpen={isOpen}
+        />
         </ModalContent>
       </Modal>
 
