@@ -48,7 +48,7 @@ export default function useAuthUser(): AuthUser {
       return;
     }
 
-    const memo = username + Date.now();
+    const memo = username + " signed up with skatehive app at " + Date.now();
 
     (window as any).hive_keychain.requestSignBuffer(
       username,

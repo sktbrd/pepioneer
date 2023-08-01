@@ -36,6 +36,10 @@ const HiveLogin: React.FC<HiveLoginProps> = ({ isOpen, onClose }) => {
   const handleSignUp = () => {
     window.open("https://discord.gg/skatehive", "_blank");
   };
+  const logout = () => {
+    setUsername("");
+    sessionStorage.removeItem("user");
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -64,6 +68,7 @@ const HiveLogin: React.FC<HiveLoginProps> = ({ isOpen, onClose }) => {
           )}
         </ModalBody>
         <ModalFooter>
+          <Button onClick={logout}>LogOut</Button>
           <Button onClick={onClose}>Close</Button>
         </ModalFooter>
       </ModalContent>

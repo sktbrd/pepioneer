@@ -30,25 +30,22 @@ const EvmBalance: React.FC = (): JSX.Element => {
   const { state, dispatch } = usePioneer();
   const { user } = state;
 
-  useEffect(() => {
-    console.log("EVM: ", user);
-  }, [user]);
-
   const headers = ["Asset", "Balance", "Balance USD"];
 
-  const [tableData, setTableData] = useState<Balance[]>(user.balances);
+  const [tableData, setTableData] = useState<Balance[]>(user?.balances || []);
   const [selectedBlockchain, setSelectedBlockchain] = useState<string>("all");
 
   useEffect(() => {
-    if (selectedBlockchain === "all") {
-      setTableData(user.balances);
-    } else {
-      // Explicitly specify the type for the 'balance' parameter in the filter callback
-      setTableData(user.balances.filter((balance: Balance) => balance.network === selectedBlockchain));
+    if (user?.balances) {
+      if (selectedBlockchain === "all") {
+        setTableData(user.balances);
+      } else {
+        setTableData(user.balances.filter((balance: Balance) => balance.network === selectedBlockchain));
+      }
     }
-  }, [selectedBlockchain, user.balances]);
+  }, [selectedBlockchain, user?.balances]);
 
-  const blockchains: string[] = Array.from(new Set(user.balances.map((balance: Balance) => balance.network)));
+  const blockchains: string[] = Array.from(new Set(user?.balances?.map((balance: Balance) => balance.network))) || [];
   blockchains.unshift("all");   
 
   const totalBalanceUSD = tableData.reduce(
@@ -64,14 +61,14 @@ const EvmBalance: React.FC = (): JSX.Element => {
     textarea.select();
     document.execCommand("copy");
     document.body.removeChild(textarea);
-    alert("Address copied to clipboard!");
+    alert( address +" copied to clipboard!");
   };
 
   return (
     <Box>
       <Flex align="center">
         <Box>
-          <h2>Total Estimated Balance</h2>
+          <h2>Total Estimated Balance of EVMs</h2>
           <p>{totalBalanceUSD.toFixed(2)} USD</p>
         </Box>
         <Select
@@ -88,7 +85,7 @@ const EvmBalance: React.FC = (): JSX.Element => {
         </Select>
       </Flex>
       {tableData.length === 0 ? (
-        <p>No balances found for the selected blockchain.</p>
+        <p>No balances found for the selected blockchain. Try to connect wallet again</p>
       ) : (
         <Table variant="simple">
           <Thead>
@@ -107,8 +104,9 @@ const EvmBalance: React.FC = (): JSX.Element => {
                   <Image src={balance.image} alt={balance.name} boxSize="20px" mr="2" />
                   {balance.name}
                 </Td>
-                <Td>{balance.balance}</Td>
-                <Td>{balance.balanceUSD}</Td>
+                {/* Use the toFixed method to limit the decimals */}
+                <Td>{parseFloat(balance.balance).toFixed(2)}</Td>
+                <Td>{parseFloat(balance.balanceUSD).toFixed(2)}</Td>
                 <Td>
                   <Button onClick={() => copyToClipboard(balance.pubkey)}>Receive</Button>
                 </Td>

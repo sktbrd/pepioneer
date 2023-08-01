@@ -4,7 +4,7 @@ import { usePioneer } from "lib/context/Pioneer";
 
 import NFTWallet from "./nft/nftWallet";
 import EvmBalance from "./evm /evmWallet";
-
+import HiveBalanceDisplay from "./hive/hiveBalance";
 
 
 interface NFT {
@@ -67,6 +67,7 @@ const Wallet = () => {
   return (
     <div>
       <h1>Wallet Page</h1>
+      <HiveBalanceDisplay/>      
       <EvmBalance/>
       <NFTWallet nftList={nftList} />
     </div>

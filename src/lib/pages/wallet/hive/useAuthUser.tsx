@@ -1,14 +1,34 @@
 import { useState, useEffect } from "react";
 import * as dhive from "@hiveio/dhive";
 
-export default function useAuthUser() {
+interface HiveKeychainResponse {
+  success: boolean;
+  publicKey: string;
+  result: string;
+  // Add other properties if needed
+}
+
+// Define the Account type
+interface Account {
+  name: string;
+  // Add other properties as needed
+}
+
+export type AuthUser = {
+  user: Account | null;
+  loginWithHive: (username: string) => Promise<void>;
+  logout: () => void;
+  isLoggedIn: () => boolean;
+};
+
+export default function useAuthUser(): AuthUser {
   const dhiveClient = new dhive.Client([
     "https://api.hive.blog",
     "https://api.hivekings.com",
     "https://anyx.io",
     "https://api.openhive.network",
   ]);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<Account | null>(null);
 
   useEffect(() => {
     const userData = sessionStorage.getItem("user");
@@ -17,8 +37,8 @@ export default function useAuthUser() {
     }
   }, []);
 
-  const loginWithHive = async (username) => {
-    if (typeof window === "undefined" || !window.hive_keychain) {
+  const loginWithHive = async (username: string) => {
+    if (typeof window === "undefined" || !(window as any).hive_keychain) {
       alert("Please install Hive Keychain first");
       return;
     }
@@ -30,13 +50,13 @@ export default function useAuthUser() {
 
     const memo = username + Date.now();
 
-    window.hive_keychain.requestSignBuffer(
+    (window as any).hive_keychain.requestSignBuffer(
       username,
       memo,
       "Posting",
-      async (response) => {
+      async (response: HiveKeychainResponse) => {
         if (response.success === true) {
-          console.log(response)
+          console.log(response);
           const publicKey = response.publicKey;
           try {
             const val = await dhiveClient.keys.getKeyReferences([publicKey]);
