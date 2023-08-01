@@ -1,28 +1,120 @@
-import React from "react"; // Make sure to import React
+import React, { useEffect, useState } from "react";
 import { usePioneer } from "lib/context/Pioneer";
-import { useEffect } from "react"; // Remove useState import since it's not used in this component
+import {
+  Box,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Image,
+  Spinner,
+  Select,
+  Flex,
+  Button,
+} from "@chakra-ui/react";
 
-// You can include the interface here or in a separate file, but for this example, I'll include it here
 interface TableProps {
   headers: string[];
   data: any[][];
 }
 
 const EvmBalance: React.FC = () => {
-  // Assuming usePioneer returns an object with the specified properties
   const { state, dispatch } = usePioneer();
-  const { user } = state; // Destructure only the "user" property from the "state" object
+  const { user } = state;
 
   useEffect(() => {
-    // Add any side effects or additional logic here if needed
     console.log("EVM: ", user);
-  }, [user]); // The effect will be triggered whenever the "user" property changes
+  }, [user]);
+
+  const headers = ["Asset", "Balance", "Balance USD"];
+
+  const [tableData, setTableData] = useState(user.balances);
+  const [selectedBlockchain, setSelectedBlockchain] = useState("all");
+
+  useEffect(() => {
+    if (selectedBlockchain === "all") {
+      setTableData(user.balances);
+    } else {
+      setTableData(user.balances.filter((balance) => balance.network === selectedBlockchain));
+    }
+  }, [selectedBlockchain, user.balances]);
+
+  const blockchains = Array.from(new Set(user.balances.map((balance) => balance.network)));
+  blockchains.unshift("all");
+
+  const totalBalanceUSD = tableData.reduce(
+    (total, balance) => total + parseFloat(balance.balanceUSD || "0"),
+    0
+  );
+
+  // Function to copy the receiving address to the clipboard
+  const copyToClipboard = (address) => {
+    const textarea = document.createElement("textarea");
+    textarea.value = address;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+    alert("Address copied to clipboard!");
+  };
 
   return (
-    <div>
-      User Data: {JSON.stringify(user)}
-    </div>
-  ); // Display the user data inside a div element
+    <Box>
+      <Flex align="center">
+        <Box>
+          <h2>Total Estimated Balance</h2>
+          <p>{totalBalanceUSD.toFixed(2)} USD</p>
+        </Box>
+        <Select
+          value={selectedBlockchain}
+          onChange={(e) => setSelectedBlockchain(e.target.value)}
+          ml="auto"
+          w="150px"
+        >
+          {blockchains.map((blockchain) => (
+            <option key={blockchain} value={blockchain}>
+              {blockchain === "all" ? "All Blockchains" : blockchain}
+            </option>
+          ))}
+        </Select>
+      </Flex>
+      {tableData.length === 0 ? (
+        <p>No balances found for the selected blockchain.</p>
+      ) : (
+        <Table variant="simple">
+          <Thead>
+            <Tr>
+              {headers.map((header, index) => (
+                <Th key={index}>{header}</Th>
+              ))}
+              <Th>Receive</Th>
+              <Th>Send</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {tableData.map((balance) => (
+              <Tr key={balance.id}>
+                <Td>
+                  <Image src={balance.image} alt={balance.name} boxSize="20px" mr="2" />
+                  {balance.name}
+                </Td>
+                <Td>{balance.balance}</Td>
+                <Td>{balance.balanceUSD}</Td>
+                <Td>
+                  <Button onClick={() => copyToClipboard(balance.pubkey)}>Receive</Button>
+                </Td>
+                <Td>
+                  <Button onClick={() => console.log("clicked")}>Send</Button>
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      )}
+    </Box>
+  );
 };
 
 export default EvmBalance;
