@@ -14,6 +14,7 @@ import {
   Select,
   Flex,
   Button,
+  Text
 } from "@chakra-ui/react";
 
 interface Balance {
@@ -65,7 +66,28 @@ const EvmBalance: React.FC = (): JSX.Element => {
   };
 
   return (
-    <Box>
+    <Box 
+      className="hive_box" 
+      borderRadius="12px" 
+      border="1px solid limegreen" 
+      padding="10px" 
+      overflow="auto" 
+      fontFamily="'Courier New', monospace">
+      <Text 
+        textAlign="center" 
+        borderRadius="12px" 
+        fontWeight="700" 
+        fontSize="18px" 
+        color="limegreen" 
+        padding="10px">
+        EVM Balance
+      </Text>
+      <Flex className="hive_avatar_container" alignItems="center">
+        {/* ... */}
+      </Flex>
+      <Flex className="hive_balance_container" mt="2em" overflowX="auto">
+        {/* ... */}
+      </Flex>
       <Flex align="center">
         <Box>
           <h2>Total Estimated Balance of EVMs</h2>
@@ -87,7 +109,7 @@ const EvmBalance: React.FC = (): JSX.Element => {
       {tableData.length === 0 ? (
         <p>No balances found for the selected blockchain. Try to connect wallet again</p>
       ) : (
-        <Table variant="simple">
+        <Table variant="simple" size="sm">
           <Thead>
             <Tr>
               {headers.map((header, index) => (

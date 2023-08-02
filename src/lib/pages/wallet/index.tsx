@@ -6,24 +6,35 @@ import NFTWallet from "./nft/nftWallet";
 import EvmBalance from "./evm /evmWallet";
 import HiveBalanceDisplay from "./hive/hiveBalance";
 
+import { 
+  useMediaQuery,
+  Box,
+  Flex
+ } from "@chakra-ui/react";
 
-interface NFT {
-  id: string;
-  balance: string;
+ export interface NFT {
+  imageUrl: string;
+  name: string;
+  description: string;
+  collectionAddress: string;
+  nftStandard: string;
+  network: string;
   token: {
     collection: {
-      name: string;
-      description: string;
       address: string;
-      // Other properties...
+      floorPriceEth: string;
+      logoImageUrl: string;
+      name: string;
+      network: string;
+      nftStandard: string;
+      openseaId: string;
     };
     medias: {
       originalUrl: string;
-      // Other properties...
     }[];
-    // Other properties...
   };
-  // Other properties...
+  id: string;
+  rarityRank: number | null;
 }
 
 const Wallet = () => {
@@ -64,12 +75,23 @@ const Wallet = () => {
     onStart();
   }, [api, user, user?.assetContext]);
 
+  const [isSmallerThan768] = useMediaQuery("(max-width: 768px)");
+
   return (
     <div>
       <h1>Wallet Page</h1>
-      <HiveBalanceDisplay/>      
-      <EvmBalance/>
-      <NFTWallet nftList={nftList} />
+      <Flex direction={isSmallerThan768 ? "column" : "row"}>
+        <Box flex="1" mr={isSmallerThan768 ? "0" : "10px"} mb={isSmallerThan768 ? "10px" : "0"}>
+          <Box >
+          <HiveBalanceDisplay/>
+          </Box> 
+          <Box padding="5px"></Box>
+          <NFTWallet nftList={nftList} /> 
+        </Box>
+        <Box flex="1" ml={isSmallerThan768 ? "0" : "10px"} mt={isSmallerThan768 ? "10px" : "0"}>
+          <EvmBalance/>
+        </Box>
+      </Flex>
     </div>
   );
 };

@@ -86,12 +86,12 @@ export default function HiveBalanceDisplay() {
         <Box 
             className="hive_box" 
             borderRadius="12px" 
-            border="1px solid limegreen" 
-            padding="2em" 
+            border="1px solid red" 
+            padding="10px" 
             overflow="auto" 
             fontFamily="'Courier New', monospace">
             <Text 
-                className="header" 
+                textAlign="center" 
                 borderRadius="12px" 
                 fontWeight="700" 
                 fontSize="18px" 
@@ -106,10 +106,10 @@ export default function HiveBalanceDisplay() {
                                     src={`https://images.hive.blog/u/${user.name}/avatar`}
                                     alt="profile avatar"
                                     borderRadius="20px"
-                                    border="5px solid limegreen"
+                                    border="2px solid limegreen"
                                     boxSize="40px"
                                 />
-                                <Text className="hive_name" color="limegreen">{user.name}</Text>
+                                <Text padding="10px" color="limegreen">{user.name}</Text>
                             </>
                         ) : (
                             <>

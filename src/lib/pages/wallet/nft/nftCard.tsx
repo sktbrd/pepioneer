@@ -6,10 +6,24 @@ const DEFAULT_IMAGE_URL = "https://i.gifer.com/origin/f1/f1a737e4cfba336f974af05
 interface NFTCardProps {
   imageUrl: string;
   name: string;
-  description: string;
+  floorPriceEth: string;
+  collectionAddress: string;
+  nftStandard: string;
+  network: string;
+  id: string;
+  rarityRank: number | null;
 }
 
-const NFTCard: React.FC<NFTCardProps> = ({ imageUrl, name, description }) => {
+const NFTCard: React.FC<NFTCardProps> = ({
+  imageUrl,
+  name,
+  floorPriceEth,
+  collectionAddress,
+  nftStandard,
+  network,
+  id,
+  rarityRank,
+}) => {
   const imageSrc = imageUrl || DEFAULT_IMAGE_URL;
 
   return (
@@ -18,7 +32,12 @@ const NFTCard: React.FC<NFTCardProps> = ({ imageUrl, name, description }) => {
       <Text mt={4} fontSize="xl" fontWeight="bold">
         {name}
       </Text>
-      <Text mt={2}>{description}</Text>
+      <Text mt={2}>Floor Price (ETH): {floorPriceEth}</Text>
+      <Text mt={2}>Collection Address: {collectionAddress}</Text>
+      <Text mt={2}>NFT Standard: {nftStandard}</Text>
+      <Text mt={2}>Network: {network}</Text>
+      <Text mt={2}>ID: {id}</Text>
+      <Text mt={2}>Rarity Rank: {rarityRank || "N/A"}</Text>
     </Box>
   );
 };
