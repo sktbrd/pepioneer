@@ -9,7 +9,8 @@ import HiveBalanceDisplay from "./hive/hiveBalance";
 import { 
   useMediaQuery,
   Box,
-  Flex
+  Flex,
+  Text
  } from "@chakra-ui/react";
 
  export interface NFT {
@@ -79,7 +80,15 @@ const Wallet = () => {
 
   return (
     <div>
-      <h1>Wallet Page</h1>
+            <Text
+        textAlign="center"
+        fontWeight="700"
+        fontSize="22px"
+        color="limegreen"
+        padding="10px"
+      >
+        Wallet Page
+      </Text>
       <Flex direction={isSmallerThan768 ? "column" : "row"}>
         <Box flex="1" mr={isSmallerThan768 ? "0" : "10px"} mb={isSmallerThan768 ? "10px" : "0"}>
           <Box >
