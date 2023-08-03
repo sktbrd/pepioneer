@@ -510,7 +510,7 @@ const Header = () => {
         isOpen={navigationDisclosure.isOpen}
       >
         <DrawerOverlay />
-        <DrawerContent>
+        <DrawerContent >
           <DrawerHeader borderBottomWidth="1px">
             Menu
           </DrawerHeader>

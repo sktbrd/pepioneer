@@ -44,7 +44,7 @@ const HiveLogin: React.FC<HiveLoginProps> = ({ isOpen, onClose }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent as="form" onSubmit={handleSubmit}>
+      <ModalContent as="form" onSubmit={handleSubmit} backgroundColor="black" border="1px solid limegreen">
         <ModalHeader>Hive Login</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
@@ -56,20 +56,29 @@ const HiveLogin: React.FC<HiveLoginProps> = ({ isOpen, onClose }) => {
                 type="text"
                 name="username"
                 placeholder="Username"
+                backgroundColor="blacl"
+                border="1px solid limegreen"
                 value={username}
                 onChange={handleInputChange}
                 required
               />
-              <Button type="submit">Login</Button>
-              <Button type="button" onClick={handleSignUp}>
+              <Button border="1px solid limegreen" type="submit">Login</Button>
+              <Button border="1px solid limegreen" type="button" onClick={handleSignUp}>
                 Sign Up
               </Button>
             </>
           )}
         </ModalBody>
         <ModalFooter>
-          <Button onClick={logout}>LogOut</Button>
-          <Button onClick={onClose}>Close</Button>
+        {user && user.name ? (
+          <>
+            <Button border="1px solid red" onClick={logout}>LogOut</Button>
+          </>
+          ) : (
+            <>
+            </>
+          )}
+          <Button border="1px solid limegreen"onClick={onClose}>Close</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
