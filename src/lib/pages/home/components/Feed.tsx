@@ -40,7 +40,10 @@ const placeholderEarnings = 69.42; // Replace with actual placeholder value
 
 const PlaceholderLoadingBar = () => {
   // Placeholder LoadingBar component, you can replace this with your actual LoadingBar
-  return <center><Text>Roll a Joint...</Text></center>;
+  return <center>
+      <Image src="https://i.gifer.com/origin/f1/f1a737e4cfba336f974af05abab62c8f_w200.gif"></Image>
+    <Text>Roll a Joint...</Text>
+    </center>;
 };
 
 const HiveBlog = () => {
@@ -59,6 +62,7 @@ const HiveBlog = () => {
       const pendingPayout = parseFloat(post.pending_payout_value.split(" ")[0]);
       const totalEarnings = totalPayout + curatorPayout + pendingPayout;
       return totalEarnings;
+      console.log(totalEarnings)
     } catch (error) {
       // If a request fails, switch to the next node
       const newIndex = (nodeIndex + 1) % nodes.length;
@@ -218,7 +222,6 @@ const HiveBlog = () => {
                 <Text>{post.title}</Text>
               </CardBody>
               <CardFooter
-                justify="space-between"
                 flexWrap="wrap"
                 sx={{
                   "& > button": {
@@ -226,9 +229,6 @@ const HiveBlog = () => {
                   },
                 }}
               >
-                <Button flex="1" variant="ghost">
-                  Share
-                </Button>
               </CardFooter>
             </Card>
           ))}

@@ -82,12 +82,7 @@ const EvmBalance: React.FC = (): JSX.Element => {
         padding="10px">
         EVM Balance
       </Text>
-      <Flex className="hive_avatar_container" alignItems="center">
-        {/* ... */}
-      </Flex>
-      <Flex className="hive_balance_container" mt="2em" overflowX="auto">
-        {/* ... */}
-      </Flex>
+
       <Flex align="center">
         <Box>
           <h2>Total Estimated Balance of EVMs</h2>

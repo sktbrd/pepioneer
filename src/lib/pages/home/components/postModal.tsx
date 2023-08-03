@@ -21,7 +21,7 @@ interface PostModalProps {
   author: string;
   user: any;
   permlink: string;
-  weight: 10000;  // Assuming you have weight data
+  weight: number; // Change this to allow any number value
 }
 
 const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, title, content, author, user, permlink, weight }) => {

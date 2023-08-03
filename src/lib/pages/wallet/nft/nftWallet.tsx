@@ -6,6 +6,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import NFTCard from "./nftCard";
+import axios from "axios";
 
 export interface NFT {
   imageUrl: string;
@@ -32,14 +33,46 @@ export interface NFT {
   rarityRank: number | null;
 }
 
-
-
 interface NFTWalletProps {
   nftList: NFT[];
 }
 
 const NFTWallet: React.FC<NFTWalletProps> = ({ nftList }) => {
   const [selectedContract, setSelectedContract] = useState<string>("all");
+  const [totalFloorPrice, setTotalFloorPrice] = useState<number>(0);
+  const [ethToUsdRate, setEthToUsdRate] = useState<number | null>(null);
+
+  useEffect(() => {
+    // Calculate the sum of floor prices for all NFTs in the wallet
+    const sum = nftList.reduce((acc, nft) => {
+      const floorPrice = parseFloat(nft.token.collection.floorPriceEth);
+      return !isNaN(floorPrice) ? acc + floorPrice : acc;
+    }, 0);
+
+    setTotalFloorPrice(sum);
+  }, [nftList]);
+
+  useEffect(() => {
+    // Fetch the current ETH to USD conversion rate from your API
+    axios.get("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd")
+      .then((response) => {
+        const rate = response.data?.ethereum?.usd;
+        if (rate) {
+          setEthToUsdRate(rate);
+        } else {
+          console.error("Invalid API response:", response.data);
+          setEthToUsdRate(null);
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to fetch ETH to USD rate:", error);
+        setEthToUsdRate(null);
+      });
+  }, []);
+  
+  
+
+  const usdConvertedAmount = isNaN(totalFloorPrice) || ethToUsdRate === null ? null : totalFloorPrice * ethToUsdRate;
 
   // Create a mapping between contract addresses and collection names
   const contractNameMap: { [address: string]: string } = {};
@@ -52,7 +85,7 @@ const NFTWallet: React.FC<NFTWalletProps> = ({ nftList }) => {
   const contracts: string[] = Array.from(new Set(nftList.map((nft: NFT) => nft.token.collection.address))) || [];
   contracts.unshift("all");
 
-  // Filter the NFTs based on selected collection address
+  // Filter the NFTs based on the selected collection address
   const filteredNftList =
     selectedContract === "all"
       ? nftList
@@ -63,6 +96,14 @@ const NFTWallet: React.FC<NFTWalletProps> = ({ nftList }) => {
       <Text borderRadius="12px" fontWeight="700" fontSize="18px" color="limegreen" padding="10px">
         NFT Portfolio
       </Text>
+      <Text textAlign="center" fontWeight="bold" fontSize="16px" mb="5px">
+        Total Floor Price: {isNaN(totalFloorPrice) ? 0 : totalFloorPrice.toFixed(2)} ETH
+      </Text>
+      {usdConvertedAmount !== null && !isNaN(usdConvertedAmount) && (
+        <Text textAlign="center" fontWeight="bold" fontSize="16px" mb="5px">
+          USD Equivalent: ${usdConvertedAmount.toFixed(2)}
+        </Text>
+      )}
       <Select value={selectedContract} onChange={(e) => setSelectedContract(e.target.value)} mb="10px">
         <option value="all">All Contracts</option>
         {contracts.map((contract) => (
@@ -72,17 +113,16 @@ const NFTWallet: React.FC<NFTWalletProps> = ({ nftList }) => {
         ))}
       </Select>
 
-
       <Grid templateColumns="repeat(auto-fit, minmax(200px, 1fr))" gap={4}>
-  {filteredNftList.map((nft, index) => (
-    <NFTCard
+        {filteredNftList.map((nft, index) => (
+          <NFTCard
             key={nft.token.medias[0]?.originalUrl || `${nft.id}-${index}`}
             imageUrl={nft.token.medias[0]?.originalUrl}
             name={nft.token.collection.name}
             floorPriceEth={nft.token.collection.floorPriceEth}
-            collectionAddress={nft.token.collection.address} // Corrected prop name
-            nftStandard={nft.token.collection.nftStandard} // Updated to access nested property
-            network={nft.token.collection.network} // Updated to access nested property
+            collectionAddress={nft.token.collection.address}
+            nftStandard={nft.token.collection.nftStandard}
+            network={nft.token.collection.network}
             id={nft.id}
             rarityRank={nft.rarityRank}
           />

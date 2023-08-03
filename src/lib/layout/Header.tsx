@@ -1,6 +1,5 @@
 import { CloseIcon, ArrowUpDownIcon } from "@chakra-ui/icons";
 import {
-  chakra,
   Stack,
   CircularProgress,
   Drawer,
@@ -24,8 +23,6 @@ import {
   Menu,
   Image,
   MenuButton,
-  MenuDivider,
-  Icon,
   MenuItem,
   MenuList,
   Spacer,
@@ -38,10 +35,7 @@ import {
   AccordionPanel,
   SimpleGrid,
   Card,
-  CardHeader,
-  Heading,
   CardBody,
-  CardFooter,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -71,9 +65,10 @@ import KEEPKEY_ICON from "lib/assets/png/keepkey.png";
 // @ts-ignore
 import METAMASK_ICON from "lib/assets/png/metamask.png";
 // @ts-ignore
-import PIONEER_ICON from "lib/assets/png/pioneer.png";
+import HIVE_ICON from "lib/assets/png/hive_power.png";
 // import Context from "lib/context";
 import {usePioneer} from "lib/context/Pioneer";
+
 import HiveLogin from "lib/pages/home/components/HiveLoginModal";
 
 const getWalletType = (user: { walletDescriptions: any[] }, context: any) => {
@@ -88,7 +83,7 @@ const getWalletBadgeContent = (walletType: string) => {
   const icons: any = {
     metamask: METAMASK_ICON,
     keepkey: KEEPKEY_ICON,
-    native: PIONEER_ICON,
+    native: HIVE_ICON,
   };
 
   const icon = icons[walletType];
@@ -108,7 +103,7 @@ const getWalletSettingsContent = (walletType: string) => {
   const icons: any = {
     metamask: METAMASK_ICON,
     keepkey: KEEPKEY_ICON,
-    native: PIONEER_ICON,
+    native: HIVE_ICON,
   };
 
   const icon = icons[walletType];
@@ -312,7 +307,7 @@ const Header = () => {
           const icons:any = {
             metamask: METAMASK_ICON,
             keepkey: KEEPKEY_ICON,
-            native: PIONEER_ICON,
+            native: HIVE_ICON,
           };
           // @ts-ignore
           let walletImage = icons[walletType];
@@ -510,17 +505,18 @@ const Header = () => {
         isOpen={navigationDisclosure.isOpen}
       >
         <DrawerOverlay />
-        <DrawerContent >
-          <DrawerHeader borderBottomWidth="1px">
+        <DrawerContent   borderRadius="5px"  border="1px solid limegreen">
+          <DrawerHeader background="black" border="1px solid limegreen" borderBottomWidth="1px">
             Menu
           </DrawerHeader>
           <DrawerBody bg={'black'} >
-            <Button w="full" mb={2} onClick={() => handleNavigate("/")}>
+            <Button w="full" mb={2} border="1px solid limegreen" onClick={() => handleNavigate("/")}>
               Home
             </Button>
-            <Button w="full" mb={2} onClick={() => handleNavigate("/wallet")}>
+            <Button w="full" mb={2} border="1px solid limegreen" onClick={() => handleNavigate("/wallet")}>
               Wallet
             </Button>
+            <hr></hr>
           </DrawerBody>
         </DrawerContent>
       </Drawer>
@@ -556,7 +552,7 @@ const Header = () => {
             <div>
               <Card align="center" onClick={handleCardClick}>
                 <CardBody>
-                  <Avatar src="assets/favicon.ico">
+                  <Avatar src={HIVE_ICON}>
                     {nativePaired ? (
                       <div>
                         <AvatarBadge boxSize="1.25em" bg="green.500" />

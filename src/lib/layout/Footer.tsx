@@ -11,8 +11,8 @@ const Footer = () => {
     >
       <Text fontSize="xs">
         {new Date().getFullYear()} -{" "}
-        <Link href="https://pioneers.dev" isExternal>
-          pioneers.dev
+        <Link href="https://docs.skatehive.app" isExternal>
+          built with open source weed. copyright is a tripping right now
         </Link>
       </Text>
     </Flex>
