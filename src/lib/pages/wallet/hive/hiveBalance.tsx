@@ -1,10 +1,8 @@
-import React from "react";
 import { Image, Box, Table, Thead, Tbody, Tr, Th, Td, Text, Flex, Button } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import SendHiveModal from "./sendHiveModal";
 import useAuthUser from "./useAuthUser";
 import * as dhive from "@hiveio/dhive";
-
 
 const dhiveClient = new dhive.Client([
   "https://api.hive.blog",
@@ -19,7 +17,6 @@ const SAVINGS_LOGO_URL = "src/lib/assets/png/savings-hive.png";
 const HIVE_POWER_LOGO_URL = "src/lib/assets/png/hive_power.png";
 const DEFAULT_AVATAR_URL = "https://i.gifer.com/origin/f1/f1a737e4cfba336f974af05abab62c8f_w200.gif";
 
-// Define the user interface
 interface User {
   balance: string;
   hbd_balance: string;
@@ -39,8 +36,29 @@ export default function HiveBalanceDisplay() {
   const [showModal, setShowModal] = useState(false);
   const [toAddress, setToAddress] = useState("");
   const [amount, setAmount] = useState("");
+  const [conversionRate, setConversionRate] = useState<number>(0);
+  const [totalWorth, setTotalWorth] = useState<number>(0);
 
-  // Function to convert vesting shares to Hive power
+  const fetchConversionRate = async () => {
+    try {
+      const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=hive&vs_currencies=usd");
+      const data = await response.json();
+      setConversionRate(data.hive.usd);
+    } catch (error) {
+      console.error("Error fetching conversion rate:", error);
+    }
+  };
+  const fetchHbdPrice = async () => {
+    try {
+      const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=hive_dollar&vs_currencies=usd");
+      const data = await response.json();
+      return data.hive_dollar.usd;
+    } catch (error) {
+      console.error("Error fetching HBD price:", error);
+      return 0;
+    }
+  };
+
   const convertVestingSharesToHivePower = async (
     vestingShares: string,
     delegatedVestingShares: string,
@@ -66,20 +84,38 @@ export default function HiveBalanceDisplay() {
     const vestHive =
       (parseFloat(result.result.total_vesting_fund_hive) * availableVESTS) /
       parseFloat(result.result.total_vesting_shares);
-    return vestHive.toFixed(3);
+
+    const delegatedHivePower =
+      (parseFloat(result.result.total_vesting_fund_hive) * delegatedVestingSharesFloat) /
+      parseFloat(result.result.total_vesting_shares);
+
+    return {
+      hivePower: vestHive.toFixed(3),
+      delegatedHivePower: delegatedHivePower.toFixed(3),
+    };
   };
 
   const onStart = async function () {
     if (user) {
+      await fetchConversionRate();
+      const hbdPrice = await fetchHbdPrice();
       setHiveBalance(user.balance);
       setHbdBalance(user.hbd_balance);
       setSavingsBalance(user.savings_hbd_balance);
-      const hivePower = await convertVestingSharesToHivePower(
+      const { hivePower, delegatedHivePower } = await convertVestingSharesToHivePower(
         user.vesting_shares,
         user.delegated_vesting_shares,
         user.received_vesting_shares
       );
-      setHivePower(hivePower);
+      setHivePower(`${hivePower} + ${delegatedHivePower} (delegated)`);
+
+      const hiveWorth = parseFloat(user.balance.split(" ")[0]) * conversionRate;
+      const hivePowerWorth = (parseFloat(hivePower) + parseFloat(delegatedHivePower)) * conversionRate; // Include delegated HP
+      const hbdWorth = parseFloat(user.hbd_balance.split(" ")[0]) * hbdPrice; // HBD
+      const savingsWorth = parseFloat(user.savings_hbd_balance.split(" ")[0]) * hbdPrice; // HBD
+
+      const total = hiveWorth + hivePowerWorth + hbdWorth + savingsWorth;
+      setTotalWorth(total);
     }
   };
 
@@ -88,7 +124,7 @@ export default function HiveBalanceDisplay() {
   }, [user]);
 
   const handleTransfer = async () => {
-    // Your existing transfer logic
+    console.log("user wants to transfer")
   };
 
   const handleOpenModal = (balanceType: string) => {
@@ -146,40 +182,23 @@ export default function HiveBalanceDisplay() {
           </>
         )}
       </Flex>
+      <Text>Total Worth in USD: ${totalWorth.toFixed(2)}</Text>
       <Table variant="simple">
         <Thead>
           <Tr>
-            <Th>Type</Th>
+            <Th></Th>
             <Th>Balance</Th>
           </Tr>
         </Thead>
         <Tbody>
           <Tr>
             <Td>
-              <Button border={"1px solid red"} onClick={() => handleOpenModal("Hive Balance")}>
-                <Image padding="5px" src={HIVE_LOGO_URL} alt="Hive Logo" boxSize="40px" />
-                <Text padding={"10px"}>Manage Hive</Text>
+              <Button border={"1px solid red"} onClick={() => handleOpenModal("Hive")}>
+                <Image src={HIVE_LOGO_URL} alt="Hive Logo" boxSize="40px" />
+                <Text padding={"10px"}>Manage HIVE.</Text>
               </Button>
             </Td>
-            <Td>{user?.balance || "Try Connect your wallet and refresh the page"}</Td>
-          </Tr>
-          <Tr>
-            <Td>
-              <Button border={"1px solid red"} onClick={() => handleOpenModal("HBD Balance")}>
-                <Image padding="5px" src={HBD_LOGO_URL} alt="HBD Logo" boxSize="40px" />
-                <Text padding={"10px"}>Manage HBD</Text>
-              </Button>
-            </Td>
-            <Td>{user?.hbd_balance || "Try Connect your wallet and refresh the page"}</Td>
-          </Tr>
-          <Tr>
-            <Td>
-              <Button border={"1px solid red"} onClick={() => handleOpenModal("Savings Balance")}>
-                <Image padding="5px" src={SAVINGS_LOGO_URL} alt="Savings Logo" boxSize="40px" />
-                <Text padding={"10px"}>Manage Sav</Text>
-              </Button>
-            </Td>
-            <Td>{user?.savings_hbd_balance || "Try Connect your wallet and refresh the page"} Savings</Td>
+            <Td>{hiveBalance || "Try Connect your wallet and refresh the page"} HIVE</Td>
           </Tr>
           <Tr>
             <Td>
@@ -188,7 +207,25 @@ export default function HiveBalanceDisplay() {
                 <Text padding={"10px"}>Manage HP.</Text>
               </Button>
             </Td>
-            <Td>{hivePower || "Try Connect your wallet and refresh the page"}</Td>
+            <Td>{hivePower || "Try Connect your wallet and refresh the page"} HP</Td>
+          </Tr>
+          <Tr>
+            <Td>
+              <Button border={"1px solid red"} onClick={() => handleOpenModal("HBD")}>
+                <Image src={HBD_LOGO_URL} alt="HBD Logo" boxSize="40px" />
+                <Text padding={"10px"}>Manage HBD.</Text>
+              </Button>
+            </Td>
+            <Td>{hbdBalance || "Try Connect your wallet and refresh the page"} HBD</Td>
+          </Tr>
+          <Tr>
+            <Td>
+              <Button border={"1px solid red"} onClick={() => handleOpenModal("Savings")}>
+                <Image src={SAVINGS_LOGO_URL} alt="Savings Logo" boxSize="40px" />
+                <Text padding={"10px"}>Manage Savings.</Text>
+              </Button>
+            </Td>
+            <Td>{savingsBalance || "Try Connect your wallet and refresh the page"} Savings</Td>
           </Tr>
         </Tbody>
       </Table>

@@ -5,7 +5,7 @@ import { usePioneer } from "lib/context/Pioneer";
 import NFTWallet from "./nft/nftWallet";
 import EvmBalance from "./evm /evmWallet";
 import HiveBalanceDisplay from "./hive/hiveBalance";
-
+import FiatBalance from "./fiat/fiat";
 import { 
   useMediaQuery,
   Box,
@@ -92,6 +92,7 @@ const Wallet = () => {
       <Flex direction={isSmallerThan768 ? "column" : "row"}>
         <Box flex="1" mr={isSmallerThan768 ? "0" : "10px"} mb={isSmallerThan768 ? "10px" : "0"}>
           <Box >
+          <FiatBalance/>
           <HiveBalanceDisplay/>
           </Box> 
           <Box padding="5px"></Box>
