@@ -64,6 +64,7 @@ const EvmBalance: React.FC = (): JSX.Element => {
     document.body.removeChild(textarea);
     alert( address +" copied to clipboard!");
   };
+  
 
   return (
     <Box 

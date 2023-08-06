@@ -4,6 +4,8 @@ import SendHiveModal from "./sendHiveModal";
 import useAuthUser from "./useAuthUser";
 import * as dhive from "@hiveio/dhive";
 
+import FiatBalance from "../fiat/fiat";
+
 const dhiveClient = new dhive.Client([
   "https://api.hive.blog",
   "https://api.hivekings.com",
@@ -43,11 +45,15 @@ export default function HiveBalanceDisplay() {
     try {
       const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=hive&vs_currencies=usd");
       const data = await response.json();
-      setConversionRate(data.hive.usd);
+      const conversionRate = data.hive.usd;
+      console.log("HIVE: ", conversionRate);
+      return conversionRate; // Return the conversion rate as a number
     } catch (error) {
       console.error("Error fetching conversion rate:", error);
+      return 0;
     }
   };
+  
   const fetchHbdPrice = async () => {
     try {
       const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=hive_dollar&vs_currencies=usd");
@@ -97,27 +103,41 @@ export default function HiveBalanceDisplay() {
 
   const onStart = async function () {
     if (user) {
-      await fetchConversionRate();
-      const hbdPrice = await fetchHbdPrice();
-      setHiveBalance(user.balance);
-      setHbdBalance(user.hbd_balance);
-      setSavingsBalance(user.savings_hbd_balance);
-      const { hivePower, delegatedHivePower } = await convertVestingSharesToHivePower(
-        user.vesting_shares,
-        user.delegated_vesting_shares,
-        user.received_vesting_shares
-      );
-      setHivePower(`${hivePower} + ${delegatedHivePower} (delegated)`);
-
-      const hiveWorth = parseFloat(user.balance.split(" ")[0]) * conversionRate;
-      const hivePowerWorth = (parseFloat(hivePower) + parseFloat(delegatedHivePower)) * conversionRate; // Include delegated HP
-      const hbdWorth = parseFloat(user.hbd_balance.split(" ")[0]) * hbdPrice; // HBD
-      const savingsWorth = parseFloat(user.savings_hbd_balance.split(" ")[0]) * hbdPrice; // HBD
-
-      const total = hiveWorth + hivePowerWorth + hbdWorth + savingsWorth;
-      setTotalWorth(total);
+      try {
+        const [conversionRate, hbdPrice, vestingSharesData] = await Promise.all([
+          fetchConversionRate(),
+          fetchHbdPrice(),
+          convertVestingSharesToHivePower(
+            user.vesting_shares,
+            user.delegated_vesting_shares,
+            user.received_vesting_shares
+          ),
+        ]);
+  
+        const hiveWorth = parseFloat(user.balance.split(" ")[0]) * conversionRate;
+        const hivePowerWorth =
+          (parseFloat(vestingSharesData.hivePower) + parseFloat(vestingSharesData.delegatedHivePower)) *
+          conversionRate;
+        const hbdWorth = parseFloat(user.hbd_balance.split(" ")[0]) * hbdPrice;
+        const savingsWorth = parseFloat(user.savings_hbd_balance.split(" ")[0]) * hbdPrice;
+  
+        const total = hiveWorth + hivePowerWorth + hbdWorth + savingsWorth;
+        setConversionRate(conversionRate);
+        setHbdBalance(user.hbd_balance);
+        setHiveBalance(user.balance);
+        setSavingsBalance(user.savings_hbd_balance);
+        setHivePower(`${vestingSharesData.hivePower} + ${vestingSharesData.delegatedHivePower} (delegated)`);
+        setTotalWorth(total);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     }
   };
+  
+  useEffect(() => {
+    onStart();
+  }, [user]);
+  
 
   useEffect(() => {
     onStart();
@@ -137,7 +157,7 @@ export default function HiveBalanceDisplay() {
     console.log(`Clicked ${balanceType} logo`);
     console.log(user);
   };
-
+  
   return (
     <Box
       className="hive_box"
@@ -147,6 +167,8 @@ export default function HiveBalanceDisplay() {
       overflow="auto"
       fontFamily="'Courier New', monospace"
     >
+      <FiatBalance totalWorth={totalWorth} />
+
       <Text
         textAlign="center"
         borderRadius="12px"
@@ -195,7 +217,7 @@ export default function HiveBalanceDisplay() {
             <Td>
               <Button border={"1px solid red"} onClick={() => handleOpenModal("Hive")}>
                 <Image src={HIVE_LOGO_URL} alt="Hive Logo" boxSize="40px" />
-                <Text padding={"10px"}>Manage HIVE.</Text>
+                <Text padding={"10px"}>Manage HIVE</Text>
               </Button>
             </Td>
             <Td>{hiveBalance || "Try Connect your wallet and refresh the page"} HIVE</Td>
@@ -204,7 +226,7 @@ export default function HiveBalanceDisplay() {
             <Td>
               <Button border={"1px solid red"} onClick={() => handleOpenModal("Hive Power")}>
                 <Image src={HIVE_POWER_LOGO_URL} alt="Hive Power Logo" boxSize="40px" />
-                <Text padding={"10px"}>Manage HP.</Text>
+                <Text padding={"10px"}>Manage HP</Text>
               </Button>
             </Td>
             <Td>{hivePower || "Try Connect your wallet and refresh the page"} HP</Td>
@@ -213,7 +235,7 @@ export default function HiveBalanceDisplay() {
             <Td>
               <Button border={"1px solid red"} onClick={() => handleOpenModal("HBD")}>
                 <Image src={HBD_LOGO_URL} alt="HBD Logo" boxSize="40px" />
-                <Text padding={"10px"}>Manage HBD.</Text>
+                <Text padding={"10px"}>Manage HBD</Text>
               </Button>
             </Td>
             <Td>{hbdBalance || "Try Connect your wallet and refresh the page"} HBD</Td>
@@ -222,7 +244,7 @@ export default function HiveBalanceDisplay() {
             <Td>
               <Button border={"1px solid red"} onClick={() => handleOpenModal("Savings")}>
                 <Image src={SAVINGS_LOGO_URL} alt="Savings Logo" boxSize="40px" />
-                <Text padding={"10px"}>Manage Savings.</Text>
+                <Text padding={"10px"}>Manage Sav.</Text>
               </Button>
             </Td>
             <Td>{savingsBalance || "Try Connect your wallet and refresh the page"} Savings</Td>
@@ -241,3 +263,4 @@ export default function HiveBalanceDisplay() {
     </Box>
   );
 }
+

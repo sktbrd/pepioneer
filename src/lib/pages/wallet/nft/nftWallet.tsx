@@ -71,7 +71,7 @@ const NFTWallet: React.FC<NFTWalletProps> = ({ nftList }) => {
   }, []);
   
   
-
+  console.log("NFTS: ",nftList)
   const usdConvertedAmount = isNaN(totalFloorPrice) || ethToUsdRate === null ? null : totalFloorPrice * ethToUsdRate;
 
   // Create a mapping between contract addresses and collection names
@@ -112,11 +112,10 @@ const NFTWallet: React.FC<NFTWalletProps> = ({ nftList }) => {
           </option>
         ))}
       </Select>
-
       <Grid templateColumns="repeat(auto-fit, minmax(200px, 1fr))" gap={4}>
-        {filteredNftList.map((nft, index) => (
+        {filteredNftList.map((nft) => (
           <NFTCard
-            key={nft.token.medias[0]?.originalUrl || `${nft.id}-${index}`}
+            key={nft.id} // Update the key to use the unique 'id' property of the NFT
             imageUrl={nft.token.medias[0]?.originalUrl}
             name={nft.token.collection.name}
             floorPriceEth={nft.token.collection.floorPriceEth}

@@ -39,9 +39,10 @@ import {
 }
 
 const Wallet = () => {
-
   const { state, dispatch } = usePioneer();
-  const { api, user,context, wallets } = state;
+  const { api, user, context, wallets } = state;
+  const [totalWorth, setTotalWorth] = useState<number>(0); // Initialize with 0 or your desired value
+
   if (user && user.publicAddress) {
     console.log("usuario:", user.publicAddress);
   } else {
@@ -49,26 +50,35 @@ const Wallet = () => {
   }
   const address = user?.publicAddress;
   const [nftList, setNftList] = useState<NFT[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null); // Declare error state here
 
   const onStart = async function () {
     try {
       if (!api) {
-        console.error("API object is null or not available.");
+        setError("API object is null or not available.");
+        setLoading(false);
         return;
       }
 
       const portfolioBalance = await api.GetPortfolio({ address });
-
+      console.log("Port: ", address);
+      console.log("Port: ", portfolioBalance);
       if (!portfolioBalance.data || !portfolioBalance.data.nfts) {
-        console.error("No NFT data found in portfolioBalance.");
+        setError("No NFT data found in portfolioBalance.");
+        setLoading(false);
         return;
       }
 
       setNftList(portfolioBalance.data.nfts);
-      console.log("Portfolio:", portfolioBalance);
+      console.log("Portfolio:", portfolioBalance.data);
       console.log("NFTs:", portfolioBalance.data.nfts);
+      setLoading(false);
+      setError(null); // Clear any previous error messages
     } catch (e) {
       console.error("header e: ", e);
+      setError("Failed to fetch NFT data.");
+      setLoading(false);
     }
   };
 
@@ -92,7 +102,6 @@ const Wallet = () => {
       <Flex direction={isSmallerThan768 ? "column" : "row"}>
         <Box flex="1" mr={isSmallerThan768 ? "0" : "10px"} mb={isSmallerThan768 ? "10px" : "0"}>
           <Box >
-          <FiatBalance/>
           <HiveBalanceDisplay/>
           </Box> 
           <Box padding="5px"></Box>
