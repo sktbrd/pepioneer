@@ -60,9 +60,9 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, title, content, 
   }, [charactersToShow, userScrolled]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="xl">
+    <Modal isOpen={isOpen} onClose={onClose} size="xl" >
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent backgroundColor={"black"} border={"1px solid limegreen"}>
         <ModalHeader>
           <PostHeader title={title} author={author} avatarUrl={avatarUrl} onClose={onClose} /> 
         </ModalHeader>
@@ -71,6 +71,28 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, title, content, 
             children={content.slice(0, charactersToShow)}
             rehypePlugins={[rehypeRaw]}
             remarkPlugins={[remarkGfm]}
+            components={{
+              img: ({ node, alt, src, title, ...props }) => (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <img {...props} alt={alt} src={src} title={title} style={{ maxWidth: '100%', height: 'auto' , borderRadius:"10px", border:'1px solid limegreen' }} />
+                </div>
+              ),
+              a: ({node, children, ...props}) => <a {...props} style={{ color: 'yellow' }}>{children}</a>,
+              h1: ({node, children, ...props}) => <h1 {...props} style={{ fontWeight: 'bold',color: 'yellow', fontSize: '24px' }}>{children}</h1>,
+              h2: ({node, children, ...props}) => <h2 {...props} style={{ fontWeight: 'bold',color: 'yellow', fontSize: '20px' }}>{children}</h2>,
+              h3: ({node, children, ...props}) => <h3 {...props} style={{ fontWeight: 'bold',color: 'yellow', fontSize: '18px' }}>{children}</h3>,
+              blockquote: ({node, children, ...props}) => <blockquote {...props} style={{ borderLeft: '3px solid limegreen', paddingLeft: '10px', fontStyle: 'italic' }}>{children}</blockquote>,            
+              ol: ({node, children, ...props}) => <ol {...props} style={{ paddingLeft: '20px' }}>{children}</ol>,
+              ul: ({node, children, ...props}) => <ul {...props} style={{ paddingLeft: '20px' }}>{children}</ul>,
+              iframe: ({ node, ...props }) =>(
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <iframe {...props} style={{ border: '1px solid limegreen', borderRadius:'10px', maxWidth: '100%', height: '280px' }} /> 
+                </div>
+               ),
+              
+              
+
+            }}
           />
         </ModalBody>
         <PostFooter onClose={onClose} user={user} author={author} permlink={permlink} weight={weight} /> 

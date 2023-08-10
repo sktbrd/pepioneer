@@ -12,14 +12,14 @@ interface PostHeaderProps {
 
 const PostHeader: React.FC<PostHeaderProps> = ({ title, author, avatarUrl, onClose }) => { 
   return (
-    <Flex justify="space-between" align="center">
-      <Heading as="h3" size="md">
-        {title}
-      </Heading>
+    <Flex justify="flex" align="center">
       <Box>
         <Image boxSize="2rem" borderRadius="full" src={avatarUrl} alt={author} mr="4" />
         <Text fontSize="md">{author}</Text>
       </Box>
+      <Heading padding={"10px"} as="h3" size="md">
+        {title}
+      </Heading>
       <ModalCloseButton onClick={onClose} /> 
     </Flex>
   );

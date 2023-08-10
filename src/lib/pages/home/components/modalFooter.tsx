@@ -29,7 +29,7 @@ const PostFooter: React.FC<PostFooterProps> = ({ onClose, user, author, permlink
   };
   
   return (
-    <Flex justify="space-between" align="center">
+    <Flex padding="20px" justify="space-between" align="center">
       <Button
         bg="#121212"
         color="#fff"
@@ -37,6 +37,7 @@ const PostFooter: React.FC<PostFooterProps> = ({ onClose, user, author, permlink
         p={2}
         onClick={onClose}
         _hover={{ bg: 'limegreen', color: '#020202' }}
+        border={"1px solid limegreen"}
       >
         Close
       </Button>

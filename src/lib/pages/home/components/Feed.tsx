@@ -46,9 +46,14 @@ const PlaceholderLoadingBar = () => {
     </center>;
 };
 
-const HiveBlog = () => {
+interface HiveBlogProps {
+  tag?: string;
+  queryType?: any;
+}
+
+const HiveBlog: React.FC<HiveBlogProps> = ({ queryType = "created",tag = "hive-173115" }) => {
   const [posts, setPosts] = useState<any[]>([]);
-  const [tag, setTag] = useState("hive-173115"); // set the default search author to "skatehive"
+  const [currentTag, setTag] = useState(tag);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPost, setSelectedPost] = useState<any | null>(null);
   const [client, setClient] = useState(new Client(nodes[0]));
@@ -81,9 +86,9 @@ const HiveBlog = () => {
     try {
       const query = {
         tag: tag,
-        limit: 100,
+        limit: 50,
       };
-      const result = await client.database.getDiscussions("created", query);
+      const result = await client.database.getDiscussions(queryType, query);
 
       const postsWithThumbnails = result.map((post) => {
         const metadata = JSON.parse(post.json_metadata);
@@ -187,6 +192,7 @@ const HiveBlog = () => {
               maxW="md"
               mb={4}
               onClick={() => handlePostClick(post)}
+              cursor="pointer"
             >
               <CardHeader>
                 <Flex>
@@ -229,7 +235,9 @@ const HiveBlog = () => {
                   },
                 }}
               >
+                <Text color="white">Earning: ${post.earnings.toFixed(2)}</Text>
               </CardFooter>
+
             </Card>
           ))}
         </Box>

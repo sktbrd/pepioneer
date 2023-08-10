@@ -1,3 +1,7 @@
+
+
+
+
 import React, { useEffect, useState } from "react";
 import { usePioneer } from "lib/context/Pioneer";
 import {
@@ -12,7 +16,7 @@ import {
   Select,
   Flex,
   Button,
-  Text
+  Text,
 } from "@chakra-ui/react";
 import EvmSendModal from "./evmSendModal";
 
@@ -78,15 +82,27 @@ const EvmBalance: React.FC = (): JSX.Element => {
 
   useEffect(() => {
     if (user?.balances) {
+      let sortedBalances: EvmBalanceItem[] = [];
       if (selectedBlockchain === "all") {
-        setTableData(user.balances);
+        sortedBalances = user.balances.slice();
       } else {
-        setTableData(user.balances.filter((balance: EvmBalanceItem) => balance.network === selectedBlockchain));
+        sortedBalances = user.balances.filter(
+          (balance: EvmBalanceItem) => balance.network === selectedBlockchain
+        );
       }
+
+      // Sort the balances array in descending order based on balanceUSD
+      sortedBalances.sort((a: EvmBalanceItem, b: EvmBalanceItem) =>
+        parseFloat(b.balanceUSD) - parseFloat(a.balanceUSD)
+      );
+
+      setTableData(sortedBalances);
     }
   }, [selectedBlockchain, user?.balances]);
 
-  const blockchains: string[] = Array.from(new Set(user?.balances?.map((balance: EvmBalanceItem) => balance.network))) || [];
+  const blockchains: string[] = Array.from(
+    new Set(user?.balances?.map((balance: EvmBalanceItem) => balance.network))
+  ) || [];
   blockchains.unshift("all");
 
   const totalBalanceUSD = tableData.reduce(
@@ -110,8 +126,22 @@ const EvmBalance: React.FC = (): JSX.Element => {
   };
 
   return (
-    <Box className="hive_box" borderRadius="12px" border="1px solid limegreen" padding="10px" overflow="auto" fontFamily="'Courier New', monospace">
-      <Text textAlign="center" borderRadius="12px" fontWeight="700" fontSize="18px" color="limegreen" padding="10px">
+    <Box
+      className="hive_box"
+      borderRadius="12px"
+      border="1px solid limegreen"
+      padding="10px"
+      overflow="auto"
+      fontFamily="'Courier New', monospace"
+    >
+      <Text
+        textAlign="center"
+        borderRadius="12px"
+        fontWeight="700"
+        fontSize="18px"
+        color="limegreen"
+        padding="10px"
+      >
         EVM Balance
       </Text>
 
@@ -120,7 +150,12 @@ const EvmBalance: React.FC = (): JSX.Element => {
           <h2>Total Estimated Balance of EVMs</h2>
           <p>{totalBalanceUSD.toFixed(2)} USD</p>
         </Box>
-        <Select value={selectedBlockchain} onChange={(e) => setSelectedBlockchain(e.target.value)} ml="auto" w="150px">
+        <Select
+          value={selectedBlockchain}
+          onChange={(e) => setSelectedBlockchain(e.target.value)}
+          ml="auto"
+          w="150px"
+        >
           {blockchains.map((blockchain) => (
             <option key={blockchain} value={blockchain as string}>
               {blockchain === "all" ? "All Blockchains" : blockchain}
@@ -148,13 +183,15 @@ const EvmBalance: React.FC = (): JSX.Element => {
                   <Image src={balance.image} alt={balance.name} boxSize="20px" mr="2" />
                   {balance.name}
                 </Td>
-                <Td>{parseFloat(balance.balance).toFixed(2)}</Td>
+                <Td>{parseFloat(balance.balance).toFixed(3)}</Td>
                 <Td>{parseFloat(balance.balanceUSD).toFixed(2)}</Td>
                 <Td>
-                  <Button onClick={() => copyToClipboard(balance.pubkey)}>Receive</Button>
+                  <Button border="1px solid limegreen" onClick={() => copyToClipboard(balance.pubkey)}>Receive</Button>
                 </Td>
                 <Td>
-                  <Button onClick={() => handleSendButtonClick(balance as TokenInfo)}>Send</Button>
+                  <Button border="1px solid limegreen" onClick={() => handleSendButtonClick(balance as TokenInfo)}>
+                    Send
+                  </Button>
                 </Td>
               </Tr>
             ))}

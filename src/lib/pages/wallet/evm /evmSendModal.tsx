@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+
+
 import {
   Modal,
   ModalOverlay,
@@ -67,10 +69,12 @@ interface EvmSendModalProps {
   tokenInfo: TokenInfo | null;
 }
 
+
 const EvmSendModal: React.FC<EvmSendModalProps> = ({ isOpen, onClose, tokenInfo }) => {
   const [amount, setAmount] = useState<string>("");
   const [toAddress, setToAddress] = useState<string>("");
   const [error, setError] = useState<string>("");
+
 
   const handleSend = () => {
     // ... (implement send functionality here)
@@ -79,7 +83,7 @@ const EvmSendModal: React.FC<EvmSendModalProps> = ({ isOpen, onClose, tokenInfo 
   };
 
   if (!tokenInfo) return null;
-
+  
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl">
       <ModalOverlay />
@@ -91,7 +95,6 @@ const EvmSendModal: React.FC<EvmSendModalProps> = ({ isOpen, onClose, tokenInfo 
               <Text alignItems="center" fontSize="lg" fontWeight="bold">
                 {tokenInfo.symbol}
               </Text>
-            
             </Flex>
             <VStack spacing={4} align="left">
               <FormControl isInvalid={!!error}>

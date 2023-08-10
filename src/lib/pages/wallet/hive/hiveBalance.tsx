@@ -14,9 +14,9 @@ const dhiveClient = new dhive.Client([
 ]);
 
 const HIVE_LOGO_URL = "https://cryptologos.cc/logos/hive-blockchain-hive-logo.png";
-const HBD_LOGO_URL = "src/lib/assets/png/HBD.png";
-const SAVINGS_LOGO_URL = "src/lib/assets/png/savings-hive.png";
-const HIVE_POWER_LOGO_URL = "src/lib/assets/png/hive_power.png";
+const HBD_LOGO_URL = "https://i.ibb.co/C6TPhs3/HBD.png";
+const SAVINGS_LOGO_URL = "https://i.ibb.co/rMVdTYt/savings-hive.png";
+const HIVE_POWER_LOGO_URL = "https://i.ibb.co/C9bCZBp/hive-power.png";
 const DEFAULT_AVATAR_URL = "https://i.gifer.com/origin/f1/f1a737e4cfba336f974af05abab62c8f_w200.gif";
 
 interface User {
