@@ -108,15 +108,31 @@ ${showFooter ? defaultFooter : ''}
   };
 
   return (
-      <Flex justifyContent="center" alignItems="flex-start" padding="20px">
-        <Box width="50%">
+    <Flex
+      justifyContent="center"
+      alignItems="flex-start"
+      flexDirection={{ base: 'column-reverse', md: 'row' }} // Stack vertically on mobile, side-by-side on desktop
+      padding="20px"
+    >
+      <Box width="100%" marginBottom={{ base: '20px', md: '0' }}>
+        <Text>1. Add Title</Text>
+        <Input
+          value={title}
+          placeholder="Post Title"
+          marginBottom="10px"
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <Text>2. Add Video</Text>
+        <Flex>
           <Input
-            value={title}
-            placeholder="Post Title"
+            value={videoLink}
+            placeholder="YouTube Video URL"
             marginBottom="10px"
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => setVideoLink(e.target.value)}
           />
-        <Text>Add Images</Text>
+          <Button onClick={handleAddVideo}>Add Video</Button>
+        </Flex>
+        <Text>3. Add Images</Text>
         <Flex>
           {selectedOption === 'url' ? (
             <>
@@ -126,37 +142,24 @@ ${showFooter ? defaultFooter : ''}
                 marginBottom="10px"
                 onChange={(e) => setImage(e.target.value)}
               />
-              <Button onClick={handleAddImage}>Add </Button>
+              <Button onClick={handleAddImage}>Add</Button>
             </>
           ) : (
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-            />
+            <input type="file" accept="image/*" onChange={handleFileChange} />
           )}
           <Flex>
-          <Select
-            value={selectedOption}
-            onChange={(e) => setSelectedOption(e.target.value as 'url' | 'file')}
-          >
-            <option value="url"> URL</option>
-            <option value="file">Upload </option>
-          </Select>
-
+            <Select
+              value={selectedOption}
+              onChange={(e) =>
+                setSelectedOption(e.target.value as 'url' | 'file')
+              }
+            >
+              <option value="url">URL</option>
+              <option value="file">Upload</option>
+            </Select>
           </Flex>
         </Flex>
-        <Flex>
-        <Input
-          value={videoLink}
-          placeholder="YouTube Video URL"
-          marginBottom="10px"
-          onChange={(e) => setVideoLink(e.target.value)}
-        />
-        <Button onClick={handleAddVideo}>Add Video</Button>
-       
-        </Flex>
-        <Text>Description or Blog</Text>
+        <Text>4. Description or Blog about it</Text>
         <Textarea
           value={markdownContent}
           onChange={(e) => setMarkdownContent(e.target.value)}
@@ -167,71 +170,215 @@ ${showFooter ? defaultFooter : ''}
           isChecked={showFooter}
           onChange={() => setShowFooter(!showFooter)}
         >
-          Add Footer
+          Add Skatehive Footer
         </Checkbox>
+        <Text>5. Add Thumbnail</Text>
       </Box>
-
-      <Divider orientation="vertical" height="400px" mx="20px" />
-      <Box width="50%">
-      <Text fontSize="36" fontWeight="bold" mb="10px">
+  
+      <Divider
+        orientation="vertical"
+        width={{ base: '100%', md: '1px' }} // Full width on mobile, thin line on desktop
+        height={{ base: '1px', md: 'auto' }} // Thin line on mobile, full height on desktop
+        mx={{ base: '0', md: '20px' }}
+      />
+  
+      <Box width="100%">
+        <Text fontSize="36" fontWeight="bold" mb="10px">
           {title}
         </Text>
         <ReactMarkdown
           children={markdownContent}
           remarkPlugins={[remarkGfm]}
-          skipHtml={false}
           components={{
             img: ({ node, alt, src, title, ...props }) => (
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <img {...props} alt={alt} src={src} title={title} style={{ maxWidth: '100%', height: 'auto' , borderRadius:"10px", border:'1px solid limegreen' }} />
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <img
+                  {...props}
+                  alt={alt}
+                  src={src}
+                  title={title}
+                  style={{
+                    maxWidth: '100%',
+                    height: 'auto',
+                    borderRadius: '10px',
+                    border: '1px solid limegreen',
+                  }}
+                />
               </div>
             ),
-            a: ({node, children, ...props}) => <a {...props} style={{ color: 'yellow' }}>{children}</a>,
-            h1: ({node, children, ...props}) => <h1 {...props} style={{ fontWeight: 'bold',color: 'yellow', fontSize: '24px' }}>{children}</h1>,
-            h2: ({node, children, ...props}) => <h2 {...props} style={{ fontWeight: 'bold',color: 'yellow', fontSize: '20px' }}>{children}</h2>,
-            h3: ({node, children, ...props}) => <h3 {...props} style={{ fontWeight: 'bold',color: 'yellow', fontSize: '18px' }}>{children}</h3>,
-            blockquote: ({node, children, ...props}) => <blockquote {...props} style={{ borderLeft: '3px solid limegreen', paddingLeft: '10px', fontStyle: 'italic' }}>{children}</blockquote>,            
-            ol: ({node, children, ...props}) => <ol {...props} style={{ paddingLeft: '20px' }}>{children}</ol>,
-            ul: ({node, children, ...props}) => <ul {...props} style={{ paddingLeft: '20px' }}>{children}</ul>,
+            a: ({ node, children, ...props }) => (
+              <a {...props} style={{ color: 'yellow' }}>
+                {children}
+              </a>
+            ),
+            h1: ({ node, children, ...props }) => (
+              <h1
+                {...props}
+                style={{ fontWeight: 'bold', color: 'yellow', fontSize: '24px' }}
+              >
+                {children}
+              </h1>
+            ),
+            h2: ({ node, children, ...props }) => (
+              <h2
+                {...props}
+                style={{ fontWeight: 'bold', color: 'yellow', fontSize: '20px' }}
+              >
+                {children}
+              </h2>
+            ),
+            h3: ({ node, children, ...props }) => (
+              <h3
+                {...props}
+                style={{ fontWeight: 'bold', color: 'yellow', fontSize: '18px' }}
+              >
+                {children}
+              </h3>
+            ),
+            blockquote: ({ node, children, ...props }) => (
+              <blockquote
+                {...props}
+                style={{
+                  borderLeft: '3px solid limegreen',
+                  paddingLeft: '10px',
+                  fontStyle: 'italic',
+                }}
+              >
+                {children}
+              </blockquote>
+            ),
+            ul: ({ node, children, ...props }) => (
+              <ul style={{ paddingLeft: '20px' }} {...props}>
+                {children}
+              </ul>
+            ),
+            ol: ({ node, children, ...props }) => (
+              <ol style={{ paddingLeft: '20px' }} {...props} >
+                {children}
+              </ol>
+            ),
             iframe: ({ node, ...props }) => (
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
                 <iframe {...props} />
               </div>
             ),
           }}
         />
         {showFooter && (
-          <ReactMarkdown 
-            children={defaultFooter} 
+          <ReactMarkdown
+            children={defaultFooter}
             remarkPlugins={[remarkGfm]}
-            skipHtml={false}
             components={{
               img: ({ node, alt, src, title, ...props }) => (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <img {...props} alt={alt} src={src} title={title} style={{ maxWidth: '100%', height: 'auto' , borderRadius:"10px", border:'1px solid limegreen' }} />
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <img
+                    {...props}
+                    alt={alt}
+                    src={src}
+                    title={title}
+                    style={{
+                      maxWidth: '100%',
+                      height: 'auto',
+                      borderRadius: '10px',
+                      border: '1px solid limegreen',
+                    }}
+                  />
                 </div>
               ),
-              a: ({node, children, ...props}) => <a {...props} style={{ color: 'yellow' }}>{children}</a>,
-              h1: ({node, children, ...props}) => <h1 {...props} style={{ fontWeight: 'bold',color: 'yellow', fontSize: '24px' }}>{children}</h1>,
-              h2: ({node, children, ...props}) => <h2 {...props} style={{ fontWeight: 'bold',color: 'yellow', fontSize: '20px' }}>{children}</h2>,
-              h3: ({node, children, ...props}) => <h3 {...props} style={{ fontWeight: 'bold',color: 'yellow', fontSize: '18px' }}>{children}</h3>,
-              blockquote: ({node, children, ...props}) => <blockquote {...props} style={{ borderLeft: '3px solid limegreen', paddingLeft: '10px', fontStyle: 'italic' }}>{children}</blockquote>,            
-              ol: ({node, children, ...props}) => <ol {...props} style={{ paddingLeft: '20px' }}>{children}</ol>,
-              ul: ({node, children, ...props}) => <ul {...props} style={{ paddingLeft: '20px' }}>{children}</ul>,
+              a: ({ node, children, ...props }) => (
+                <a {...props} style={{ color: 'yellow' }}>
+                  {children}
+                </a>
+              ),
+              h1: ({ node, children, ...props }) => (
+                <h1
+                  {...props}
+                  style={{ fontWeight: 'bold', color: 'yellow', fontSize: '24px' }}
+                >
+                  {children}
+                </h1>
+              ),
+              h2: ({ node, children, ...props }) => (
+                <h2
+                  {...props}
+                  style={{ fontWeight: 'bold', color: 'yellow', fontSize: '20px' }}
+                >
+                  {children}
+                </h2>
+              ),
+              h3: ({ node, children, ...props }) => (
+                <h3
+                  {...props}
+                  style={{ fontWeight: 'bold', color: 'yellow', fontSize: '18px' }}
+                >
+                  {children}
+                </h3>
+              ),
+              blockquote: ({ node, children, ...props }) => (
+                <blockquote
+                  {...props}
+                  style={{
+                    borderLeft: '3px solid limegreen',
+                    paddingLeft: '10px',
+                    fontStyle: 'italic',
+                  }}
+                >
+                  {children}
+                </blockquote>
+              ),
+              ul: ({ node, children, ...props }) => (
+                <ul style={{ paddingLeft: '20px' }} {...props}>
+                  {children}
+                </ul>
+              ),
+              ol: ({ node, children, ...props }) => (
+                <ol style={{ paddingLeft: '20px' }} {...props}>
+                  {children}
+                </ol>
+              ),
               iframe: ({ node, ...props }) => (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
                   <iframe {...props} />
                 </div>
-              ),              
+              ),
             }}
           />
         )}
-              <Box width="50%">
-        <Button onClick={handlePublish}>Publish</Button>
-      </Box>
+        <Box width="100%">
+          <Button onClick={handlePublish} width="100%">
+            Publish
+          </Button>
+        </Box>
       </Box>
     </Flex>
   );
+  
+  
+  
 };
 
 export default UploadPage;
