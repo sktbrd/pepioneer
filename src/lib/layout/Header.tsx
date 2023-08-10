@@ -513,6 +513,12 @@ const Header = () => {
             <Button w="full" mb={2} border="1px solid limegreen" onClick={() => handleNavigate("/")}>
               Home
             </Button>
+            <Button w="full" mb={2} border="1px solid limegreen" onClick={() => handleNavigate("/profile")}>
+              Profile
+            </Button>
+            <Button w="full" mb={2} border="1px solid limegreen" onClick={() => handleNavigate("/upload")}>
+              Upload
+            </Button>
             <Button w="full" mb={2} border="1px solid limegreen" onClick={() => handleNavigate("/wallet")}>
               Wallet
             </Button>
