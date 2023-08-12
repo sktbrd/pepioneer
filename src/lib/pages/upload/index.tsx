@@ -1,4 +1,13 @@
 import React, { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+// Hive Imports 
+import * as dhive from '@hiveio/dhive';
+import useAuthUser from '../home/components/useAuthUser';
+import { KeychainSDK } from 'keychain-sdk';
+import axios from 'axios'; 
+
+
 import {
   Box,
   Flex,
@@ -10,8 +19,7 @@ import {
   Select,
   Text
 } from '@chakra-ui/react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+
 
 interface UploadPageProps {
   title: string;
@@ -22,7 +30,32 @@ interface UploadPageProps {
   weight: number; // Change this to allow any number value
 }
 
-const defaultFooter = `# Wanna support Skatehive?
+interface User {
+  name?: string;
+}
+
+declare global {
+  interface Window {
+    hive_keychain: any;
+  }
+}
+
+const keychain = new KeychainSDK(window);
+
+
+const client = new dhive.Client([
+  'https://api.hive.blog',
+  'https://api.hivekings.com',
+  'https://anyx.io',
+  'https://api.openhive.network',
+]);
+
+
+const defaultFooter = `
+
+---
+
+# Wanna support Skatehive?
 
 **Here are a few things you can do**
 
@@ -42,32 +75,114 @@ const defaultFooter = `# Wanna support Skatehive?
 - Twitter : https://twitter.com/Skate_Hive`;
 
 const UploadPage: React.FC<UploadPageProps> = () => {
+  // User 
+  const { user } = useAuthUser() as { user: User | null };
+  // Post 
   const [title, setTitle] = useState('');
   const [markdownContent, setMarkdownContent] = useState('');
   const [showFooter, setShowFooter] = useState(false);
   const [videoLink, setVideoLink] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [image, setImage] = useState(''); // Add this line
+  const [thumbnail, setThumbnail] = useState<string | null>(null);
+  const [addedImages, setAddedImages] = useState<string[]>([]);
+  const [selectedThumbnail, setSelectedThumbnail] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0); // Initial value
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files && event.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-    }
-  };
 
   const handleAddFile = () => {
     if (selectedFile) {
       const imageUrl = URL.createObjectURL(selectedFile);
-      setMarkdownContent(`${markdownContent}\n![Alt Text](${imageUrl})`);
+      setMarkdownContent(`${markdownContent}\n\n![A image should load here](${imageUrl})`);
       setSelectedFile(null);
     }
   };
 
-  const handleAddImage = () => {
-    setMarkdownContent(`${markdownContent}\n![Alt Text](${image})`);
-    setImage('');
+  
+  const PINATA_API_KEY = 'de64c0e69ab6e9098424';
+  const PINATA_API_SECRET = 'bbab398cbebee9138a0f6c9008f75e973221e4a195d7dcafe755355be824cbd7';
+  
+  const handleIPFSUpload = async () => {
+    setIsUploading(true); // Set to true at the beginning
+
+    if (selectedFile) {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        formData.append('pinataMetadata', JSON.stringify({
+            name: selectedFile.name
+        }));
+
+        try {
+            const response = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    pinata_api_key: PINATA_API_KEY,
+                    pinata_secret_api_key: PINATA_API_SECRET
+                },
+                onUploadProgress: (progressEvent) => {
+                  const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1));
+                  setUploadProgress(percentCompleted);
+                }
+            });
+
+            const ipfsHash = response.data.IpfsHash;
+            const ipfsLink = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
+            console.log("ipfs: ", ipfsLink)
+
+            setMarkdownContent(`${markdownContent}\n\n![Uploaded image should load here](${ipfsLink})`);
+            setSelectedFile(null);
+            
+            if (response && response.data && response.data.IpfsHash) {
+                const ipfsLink = `https://gateway.pinata.cloud/ipfs/${response.data.IpfsHash}`;
+                setThumbnail(ipfsLink);
+                if (ipfsLink) {
+                    setAddedImages(prev => [...prev, ipfsLink]);
+                }
+            }
+            setUploadProgress(0);  // Resetting progress after successful upload
+        } catch (error) {
+            setUploadProgress(0);  // Resetting progress in case of error
+            console.error("Error uploading file to IPFS:", error);
+        } finally {
+            setIsUploading(false); // Set to false at the end, regardless of success or error
+        }
+    }
+};
+
+
+const handleUploadFromURL = async () => {
+  if (!image) {
+      alert("Please enter a valid image URL.");
+      return;
+  }
+
+  try {
+      // Verify the image URL by fetching the image
+      const response = await fetch(image);
+      setMarkdownContent(`${markdownContent}\n\n![Uploaded image should load here](${image})`);
+
+      if (!response.ok) {
+          throw new Error("Failed to verify the image.");
+      }
+
+      // If the fetch was successful, we assume the image URL is valid
+      setThumbnail(image); // set the image URL as thumbnail
+      setAddedImages(prev => [...prev, image]); // add the image URL to the added images list
+
+  } catch (error) {
+      console.error("Error verifying the image:", error);
+      alert("Failed to verify the image. Please check the URL.");
+  }
+};
+
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+        setSelectedFile(event.target.files[0]);
+    }
   };
+
 
   const getYouTubeEmbedURL = (url: string) => {
     const videoId = url.split('v=')[1];
@@ -80,34 +195,129 @@ const UploadPage: React.FC<UploadPageProps> = () => {
   const handleAddVideo = () => {
     const embedURL = getYouTubeEmbedURL(videoLink);
     setMarkdownContent(
-      `${markdownContent}\n<iframe src="${embedURL}"></iframe>`
+      `${markdownContent}\n\n<iframe src="${embedURL}"></iframe>`
     );
     setVideoLink('');
   };
 
-  const IframeRenderer: React.FC<{ src: string }> = ({ src }) => (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <iframe src={src} />
-    </div>
-  );
-  
   
   const [selectedOption, setSelectedOption] = useState<'url' | 'file'>('url'); // Add this state
+  function slugify(text: string) {
+    return text
+        .toString()
+        .toLowerCase()
+        .replace(/\s+/g, '-')           // Replace spaces with -
+        .replace(/[^\w\-]+/g, '')       // Remove all non-word characters
+        .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+        .replace(/^-+/, '')             // Trim - from start of text
+        .replace(/-+$/, '');            // Trim - from end of text
+}
 
   const handlePublish = () => {
     // Construct the complete post body
-    const completePostBody = `
-# ${title}
-
-${markdownContent}
-${showFooter ? defaultFooter : ''}
-    `;
+    
+    const completePostBody = `${markdownContent}
+      ${showFooter ? defaultFooter : ''}`;
     
     // Log the complete post body
+    console.log('Title: ' ,title)
     console.log('Complete Post Body:', completePostBody);
+
+    const permlink = slugify(title.toLowerCase());
+    if (window.hive_keychain) { 
+      // Check if the Hive Keychain extension is available
+      const username = user?.name; // Assuming you get the logged-in user's name from the useAuthUser hook or similar
+  
+      if (username) {
+        const operations = [
+          ["comment",
+            {
+              "parent_author": "", // only for comments 
+              "parent_permlink": "skatehive", 
+              "author": username,
+              "permlink": permlink, 
+              "title": title, 
+              "body": completePostBody, 
+              "json_metadata": JSON.stringify({ tags: ["test"],
+                                                app: "pepeskate", 
+                                                image: thumbnail ? [thumbnail] : [] // This will be an array with the thumbnail URL as the first item
+              })
+            }
+          ]
+        ];
+        console.log("OPERATIONS: ", operations)
+        window.hive_keychain.requestBroadcast(username, operations, "posting", (response: any) => {
+          if (response.success) {
+            console.log("Post successfully published!");
+            // Here, you might want to redirect users to their post or show a success notification
+          } else {
+            console.error("Error publishing post:", response.message);
+            // Handle the error, e.g., by showing an error notification to the user
+          }
+        });
+      } else {
+        console.error("User not logged in!");
+        // Prompt user to login or show an appropriate message
+      }
+    } else {
+      console.error("Hive Keychain extension not found!");
+      // Inform the user to install the Hive Keychain extension
+    }
   };
+  
+  const handleImageSelection = (imageUrl: string) => {
+    setSelectedThumbnail(imageUrl);
+  };
+  
+  const ImageGallery = () => {
+    const galleryStyles = {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(3, 1fr)', // Three columns
+      gap: '10px', // Gap between items
+    };
+  
+    return (
+      <Box style={galleryStyles}>
+        {addedImages.map((img, idx) => (
+          <Box key={idx} padding="10px" borderRadius="10px" border={selectedThumbnail === img ? '3px solid green' : '1px solid white'} onClick={() => handleImageSelection(img)}>
+            <img src={img} alt="Uploaded" width="100" height="100" />
+          </Box>
+        ))}
+      </Box>
+    );
+  };
+  
+
+  const overlayStyle: React.CSSProperties = {
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    zIndex: 1,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  };
+  
+  
+
 
   return (
+      <>
+        {isUploading && (
+          <div style={overlayStyle}>
+            <Box width="100%" height="4px" backgroundColor="rgba(0,0,0,0.1)">
+              <Box
+                width={`${uploadProgress}%`}
+                height="100%"
+                backgroundColor="limegreen"
+                transition="width 0.3s"
+              />
+            </Box>
+          </div>
+        )}
     <Flex
       justifyContent="center"
       alignItems="flex-start"
@@ -142,10 +352,14 @@ ${showFooter ? defaultFooter : ''}
                 marginBottom="10px"
                 onChange={(e) => setImage(e.target.value)}
               />
-              <Button onClick={handleAddImage}>Add</Button>
+              <Button onClick={handleUploadFromURL}>Add</Button>
             </>
           ) : (
+            <>
+
             <input type="file" accept="image/*" onChange={handleFileChange} />
+            <Button onClick={handleIPFSUpload}>Upload</Button>
+            </>
           )}
           <Flex>
             <Select
@@ -159,7 +373,7 @@ ${showFooter ? defaultFooter : ''}
             </Select>
           </Flex>
         </Flex>
-        <Text>4. Description or Blog about it</Text>
+        <Text>4. Your Blog</Text>
         <Textarea
           value={markdownContent}
           onChange={(e) => setMarkdownContent(e.target.value)}
@@ -173,16 +387,22 @@ ${showFooter ? defaultFooter : ''}
           Add Skatehive Footer
         </Checkbox>
         <Text>5. Add Thumbnail</Text>
+          <ImageGallery />
+       <Box borderRadius="10px"border="1px solid limegreen" width="100%">
+          <Button onClick={handlePublish} width="100%">
+            Publish
+          </Button>
+        </Box>
       </Box>
-  
+              
       <Divider
         orientation="vertical"
         width={{ base: '100%', md: '1px' }} // Full width on mobile, thin line on desktop
         height={{ base: '1px', md: 'auto' }} // Thin line on mobile, full height on desktop
         mx={{ base: '0', md: '20px' }}
       />
-  
-      <Box width="100%">
+      
+      <Box width="100%" style={{ wordWrap: "break-word", overflow: "hidden" }}>
         <Text fontSize="36" fontWeight="bold" mb="10px">
           {title}
         </Text>
@@ -275,8 +495,10 @@ ${showFooter ? defaultFooter : ''}
               </div>
             ),
           }}
+          
         />
         {showFooter && (
+          
           <ReactMarkdown
             children={defaultFooter}
             remarkPlugins={[remarkGfm]}
@@ -366,15 +588,13 @@ ${showFooter ? defaultFooter : ''}
                 </div>
               ),
             }}
+            
           />
+          
         )}
-        <Box width="100%">
-          <Button onClick={handlePublish} width="100%">
-            Publish
-          </Button>
-        </Box>
       </Box>
     </Flex>
+      </>
   );
   
   
@@ -382,3 +602,7 @@ ${showFooter ? defaultFooter : ''}
 };
 
 export default UploadPage;
+function slugify(arg0: string) {
+  throw new Error('Function not implemented.');
+}
+

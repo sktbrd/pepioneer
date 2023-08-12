@@ -12,7 +12,7 @@ const Footer = () => {
       <Text fontSize="xs">
         {new Date().getFullYear()} -{" "}
         <Link href="https://docs.skatehive.app" isExternal>
-          built with open source weed. copyright is a tripping right now
+          built with open source weed. copyright is tripping right now
         </Link>
       </Text>
     </Flex>
