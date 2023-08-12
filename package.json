@@ -1,8 +1,8 @@
 {
-  "name": "Pepionner",
-  "version": "0.1.0",
+  "name": "Skatehive-Upload",
+  "version": "0.1.1",
   "private": true,
-  "author": "highlander",
+  "author": "Vlad",
   "scripts": {
     "dev": "vite",
     "build": "pnpm type-check && vite build",

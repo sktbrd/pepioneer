@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 // Hive Imports 
-import * as dhive from '@hiveio/dhive';
 import useAuthUser from '../home/components/useAuthUser';
 import { KeychainSDK } from 'keychain-sdk';
+import { defaultFooter } from './defaultFooter'; // Import the defaultFooter constant
+
 import axios from 'axios'; 
 
 
@@ -43,28 +44,6 @@ declare global {
 const keychain = new KeychainSDK(window);
 
 
-const defaultFooter = `
-
----
-
-# Wanna support Skatehive?
-
-**Here are a few things you can do**
-
-- Vote for [@skatehive witness](https://hivesigner.com/sign/account-witness-vote?witness=skatehive&approve=1)
-- Delegate HP to @skatehive
-- Follow our [curation trail](https://hive.vote/dash.php?i=1&trail=steemskate)
-- Buy a Skatehive OG NFT : [Buy here](https://zora.co/collect/eth:0x3ded025e441730e26ab28803353e4471669a3065/1/mint)
-
-**Join Skatehive Discord and connect with the community 👇**
-
-[![](https://i.imgur.com/GmPCq0F.png)](https://discord.gg/skatehive)
-
-**Find Skatehive On**
-
-- Hive : https://skatehive.app/@skatehive
-- Instagram : https://www.instagram.com/skatehive/
-- Twitter : https://twitter.com/Skate_Hive`;
 
 const UploadPage: React.FC<UploadPageProps> = () => {
   // User 
@@ -83,13 +62,6 @@ const UploadPage: React.FC<UploadPageProps> = () => {
   const [isUploading, setIsUploading] = useState(false);
 
 
-  const handleAddFile = () => {
-    if (selectedFile) {
-      const imageUrl = URL.createObjectURL(selectedFile);
-      setMarkdownContent(`${markdownContent}\n\n![A image should load here](${imageUrl})`);
-      setSelectedFile(null);
-    }
-  };
 
   
   const PINATA_API_KEY = 'de64c0e69ab6e9098424';
@@ -120,7 +92,6 @@ const UploadPage: React.FC<UploadPageProps> = () => {
 
             const ipfsHash = response.data.IpfsHash;
             const ipfsLink = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
-            console.log("ipfs: ", ipfsLink)
 
             setMarkdownContent(`${markdownContent}\n\n![Uploaded image should load here](${ipfsLink})`);
             setSelectedFile(null);
@@ -132,12 +103,12 @@ const UploadPage: React.FC<UploadPageProps> = () => {
                     setAddedImages(prev => [...prev, ipfsLink]);
                 }
             }
-            setUploadProgress(0);  // Resetting progress after successful upload
+            setUploadProgress(0);  
         } catch (error) {
-            setUploadProgress(0);  // Resetting progress in case of error
-            console.error("Error uploading file to IPFS:", error);
+            setUploadProgress(0);  
+            alert("Error uploading file to IPFS:");
         } finally {
-            setIsUploading(false); // Set to false at the end, regardless of success or error
+            setIsUploading(false);
         }
     }
 };
@@ -294,8 +265,6 @@ const handleUploadFromURL = async () => {
   };
   
   
-
-
   return (
       <>
         {isUploading && (
@@ -594,7 +563,5 @@ const handleUploadFromURL = async () => {
 };
 
 export default UploadPage;
-function slugify(arg0: string) {
-  throw new Error('Function not implemented.');
-}
+
 
