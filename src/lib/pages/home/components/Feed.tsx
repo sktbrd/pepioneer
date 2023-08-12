@@ -23,6 +23,9 @@
 
   import PostModal from "./postModal";
 
+  import { useNavigate } from "react-router-dom";
+
+
 
   const nodes = [
     "https://rpc.ecency.com",
@@ -157,12 +160,25 @@
       return () => window.removeEventListener("resize", handleResize);
     }, []);
 
+    const navigate = useNavigate();
+
+    const handleUploadClick = () => {
+      navigate("/upload"); // Navigate to the upload page
+    };
     return (
       
       <Box>
                 <Flex justifyContent="center">
-          <Button border={"1px solid limegreen"} padding="20px" alignSelf={"center"}  >Upload Something, lazy ass</Button>
-          </Flex>
+      <Button
+        border={"1px solid limegreen"}
+        padding="20px"
+        alignSelf={"center"}
+        marginBottom="20px" // Add space to the bottom
+        onClick={handleUploadClick} // Handle the button click to navigate
+      >
+        Upload Something, lazy ass
+      </Button>         
+       </Flex>
         <Modal isOpen={isOpen} onClose={onClose} size="xl">
           <ModalOverlay />
           <ModalContent>

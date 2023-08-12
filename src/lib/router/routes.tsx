@@ -6,7 +6,6 @@ import type { PathRouteProps } from "react-router-dom";
 const Home = React.lazy(() => import("lib/pages/home"));
 const Wallet = React.lazy(() => import("lib/pages/wallet"));
 const Profile = React.lazy(() => import("lib/pages/profile"));
-const Upload = React.lazy(() => import("lib/pages/upload"));
 
 
 export const routes: Array<PathRouteProps> = [

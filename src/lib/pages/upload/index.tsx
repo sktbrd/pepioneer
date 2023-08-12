@@ -43,14 +43,6 @@ declare global {
 const keychain = new KeychainSDK(window);
 
 
-const client = new dhive.Client([
-  'https://api.hive.blog',
-  'https://api.hivekings.com',
-  'https://anyx.io',
-  'https://api.openhive.network',
-]);
-
-
 const defaultFooter = `
 
 ---
